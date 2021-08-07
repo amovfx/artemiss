@@ -9,7 +9,7 @@ redis = Redis(host='redis', port=6379)
 def hello_world():
     redis.incr('hits')
     count = int(redis.get('hits'))
-    return f"Hello World for the {count} time."
+    return f"Visits: {count}. Andrew is very lucky to have met Lili, she is the first woman that has appreciated me."
 
 
 if __name__ == '__main__':

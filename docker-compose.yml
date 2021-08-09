@@ -6,15 +6,50 @@ services:
           context: ./flask/
           dockerfile: Dockerfile
         command: ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]
+        restart: unless-stopped
+        environment:
+            MONGO_DATABASE: user_db
+            MONGO_USERNAME: flask_user
+            MONGO_PASSWORD: flask_user_password
+            MONGO_HOST: mongo_user_db
         ports:
             - "5000"
         volumes:
-            - .:/code
+            - flask_app_data:/webapp
         depends_on:
             - redis
+            - mongo
+        links:
+            - mongo
+        networks:
+            - backend
+            - frontend
+
+#DATABASE
     redis:
         container_name: redis_db
         image: redis
+        networks:
+            - backend
+
+#figure out docker secrets
+    mongo_user_db:
+        container_name: mongo_user_db
+        image: mongo:latest
+        command: mongod --auth
+        environment:
+            - MONGO_INITDB_DATABASE=user_db
+            - MONGO_INITDB_ROOT_USERNAME=root
+            - MONGO_INITDB_ROOT_PASSWORD=pass
+            - MONGODB_DATA_DIR=/data/db
+            - MONGODB_LOG_DIR=/dev/null
+
+        volumes:
+            - mongodbdata:/data/db
+        networks:
+            - backend
+
+
 
     nginx:
         container_name: nginx_server
@@ -25,8 +60,11 @@ services:
         depends_on:
             - flask-server
             - redis
+            - mongo_user_db
         ports:
             - 80:80
+        networks:
+            - frontend
 #
 #        build:
 #            context: ./nginx/
@@ -38,3 +76,19 @@ services:
 #            - flask-server
 #        links:
 #            - flask-server
+
+
+networks:
+    frontend:
+        driver: bridge
+    backend:
+        driver: bridge
+
+#Make volumes persistent
+volumes:
+    mongodbdata:
+        driver: local
+    flask_user_app:
+        driver: local
+    nginxdata:
+        driver: local

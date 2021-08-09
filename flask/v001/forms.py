@@ -1,11 +1,32 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import Email, DataRequired, Length
 
-class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=5, max=32)])
-    submit = SubmitField('Submit')
+from mongoengine import Document, StringField, EmbeddedDocumentField, ListField, IntField
+from flask_mongoengine.wtf import model_form
 
-class RegistrationForm(LoginForm):
-    verify = PasswordField('Verify Password', validators=[DataRequired(), Length(min=5, max=32)])
+
+class Organization(Document):
+    public_key = StringField()
+
+
+class Agent(Document):
+    email = StringField(required=True)
+
+
+class Account(Document):
+    agent = EmbeddedDocumentField(Agent)
+    organizations = ListField(EmbeddedDocumentField(Organization))
+    private_key = StringField(required=True)
+
+
+
+class Post(Document):
+    message = StringField(required=True)
+    user = EmbeddedDocumentField(Agent)
+    org = EmbeddedDocumentField(Organization)
+
+
+class Request(Post):
+    psbt = StringField()
+
+
+AgentForm = model_form(Agent)
+OrganizationForm = model_form(Organization)

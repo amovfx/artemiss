@@ -1,13 +1,13 @@
 
-from mongoengine import Document, StringField, EmbeddedDocumentField, ListField, IntField
+from mongoengine import Document, StringField, EmbeddedDocumentField, ListField, EmbeddedDocument, IntField
 from flask_mongoengine.wtf import model_form
 
 
-class Organization(Document):
+class Organization(EmbeddedDocument):
     public_key = StringField()
 
 
-class Agent(Document):
+class Agent(EmbeddedDocument):
     email = StringField(required=True)
 
 
@@ -23,9 +23,6 @@ class Post(Document):
     user = EmbeddedDocumentField(Agent)
     org = EmbeddedDocumentField(Organization)
 
-
-class Request(Post):
-    psbt = StringField()
 
 
 AgentForm = model_form(Agent)

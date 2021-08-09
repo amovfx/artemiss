@@ -18,9 +18,9 @@ services:
             - flask_app_data:/webapp
         depends_on:
             - redis
-            - mongo
+            - mongo_user_db
         links:
-            - mongo
+            - mongo_user_db
         networks:
             - backend
             - frontend
@@ -88,7 +88,7 @@ networks:
 volumes:
     mongodbdata:
         driver: local
-    flask_user_app:
+    flask_app_data:
         driver: local
     nginxdata:
         driver: local

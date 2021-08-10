@@ -35,17 +35,21 @@ services:
 #figure out docker secrets
     mongo_user_db:
         container_name: mongo_user_db
-        image: mongo:latest
-        command: mongod --auth
+        image: mongo:4.0.8
+        restart: unless-stopped
+        hostname: mongodb-server
         environment:
-            - MONGO_INITDB_DATABASE=user_db
-            - MONGO_INITDB_ROOT_USERNAME=root
-            - MONGO_INITDB_ROOT_PASSWORD=pass
-            - MONGODB_DATA_DIR=/data/db
-            - MONGODB_LOG_DIR=/dev/null
+            MONGO_INITDB_DATABASE: user_db
+            MONGO_INITDB_ROOT_PASSWORD: password
+            MONGO_INITDB_ROOT_USERNAME: admin
+            MONGODB_DATA_DIR: /data/db
+
+        ports:
+            - "27017:27017"
 
         volumes:
             - mongodbdata:/data/db
+            - ./flask/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
         networks:
             - backend
 

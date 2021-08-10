@@ -34,7 +34,7 @@ def hello_world():
     count = int(redis.get('hits'))
     return f"Visits: {count}. Andrew is very lucky to have met Lili, she is the first woman that has appreciated me."
 
-@app.route('/login/', methods = ["POST"])
+@app.route('/login/', methods = ["GET","POST"])
 def login(request):
     form = AgentForm(request.POST)
     if request.method == 'POST' and form.validate():
@@ -43,6 +43,11 @@ def login(request):
         return redirect(url_for('/<id>/groups'), code=302)
         #return a redirect
 
+    return render_template("login.html", title="Register", form=AgentForm)
+
+@app.route('/logintest', methods = ["GET"])
+def login2(request):
+    form = AgentForm
     return render_template("login.html", title="Register", form=AgentForm)
 
 @app.route('/<id>/groups')

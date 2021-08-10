@@ -7,23 +7,22 @@ class Organization(EmbeddedDocument):
     public_key = StringField()
 
 
-class Agent(EmbeddedDocument):
+class Agent(Document):
     email = StringField(required=True)
+    password = StringField(required=True)
+
+    def __repr__(self):
+        return f"Agent<{self.email}::{self.password}>"
 
 
-class Account(Document):
-    agent = EmbeddedDocumentField(Agent)
-    organizations = ListField(EmbeddedDocumentField(Organization))
-    private_key = StringField(required=True)
-
-
-
-class Post(Document):
-    message = StringField(required=True)
-    user = EmbeddedDocumentField(Agent)
-    org = EmbeddedDocumentField(Organization)
-
-
-
-AgentForm = model_form(Agent)
-OrganizationForm = model_form(Organization)
+# class Account(Document):
+#     agent = EmbeddedDocumentField(Agent)
+#     organizations = ListField(EmbeddedDocumentField(Organization))
+#     private_key = StringField(required=True)
+#
+#
+#
+# class Post(Document):
+#     message = StringField(required=True)
+#     user = EmbeddedDocumentField(Agent)
+#     org = EmbeddedDocumentField(Organization)

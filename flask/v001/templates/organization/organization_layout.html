@@ -3,11 +3,11 @@
 
 
 
-{% macro render_org(org_form) %}
+{% macro render_org(org_data) %}
 <div class="jumbotron">
     <div class="jumbotron">
-        <h1>{{ org_form.name }}</h1>
-        <p>{{ org_form.description }}</p>
+        <h1>{{ org_data.name }}</h1>
+        <p>{{ org_data.description }}</p>
     </div>
 </div>
 {% endmacro %}
@@ -17,8 +17,8 @@
         <div class="col">
             <div class="page-header">
                 <h1>Organization Selection.</h1>
-                {% for i in range(10) %}
-                    {{ render_field(i) }}
+                {% for org in orgs %}
+                    {{ render_org(org) }}
                 {% endfor %}
             </div>
         </div>

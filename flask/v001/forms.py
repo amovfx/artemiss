@@ -2,7 +2,6 @@
 from mongoengine import Document, EmailField, StringField,  ObjectIdField, ReferenceField, EmbeddedDocumentField, ListField, EmbeddedDocument, IntField
 from flask_mongoengine.wtf import model_form
 from flask_wtf import FlaskForm
-from wtforms import StringField as SF, TextAreaField, Form
 class Organization(Document):
     pass
 
@@ -25,6 +24,8 @@ class Agent(Document):
 
     def __repr__(self):
         return f"Agent<{self.email}::{self.password}>"
+
+    meta = {"collection": "agents"}
 
 class Post(Document):
     """
@@ -68,7 +69,7 @@ class Organization(Document):
 
     """
 
-    name = EmailField(required=True)
+    name = StringField(required=True)
     description = StringField(required=True)
     members = ListField(ReferenceField(Agent))
 
@@ -82,6 +83,8 @@ class Organization(Document):
     taproot_script = StringField()
 
     #withdrawl policy stack
+    meta = {"collection": "orgs"}
+
 
 
 

@@ -1,0 +1,30 @@
+{% macro render_field(field) %}
+<div class="form-group">
+    <label for="{{ field.name }}" class="col-lg-2 control-label">{{ field.label.text }}</label>
+    <div class="col-lg-10">
+        {{ field(class_='form-control', **kwargs)|safe }}
+        <ul>
+        {% for error in field.errors %}
+            <li style="color:red;">{{ error }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endmacro %}
+
+{%  macro render_form(form, form_name) %}
+<div class="container">
+    <div class="row">
+        <form id="login-form" class="form" action="" method="post">
+            <h3 class="text-center text-info">{{ form_name }}</h3>
+            {{ form.csrf_token }}
+            {% for field in form %}
+                {% if field.type != 'CSRFTokenField' %}
+                    {{ render_field(field) }}
+                {% endif %}
+            {% endfor %}
+            <button type="submit" class="btn btn-info btn-md">Submit</button>
+        </form>
+    </div>
+</div>
+{% endmacro %}

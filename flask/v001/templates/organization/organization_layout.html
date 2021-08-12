@@ -1,0 +1,28 @@
+{% extends "navbar.html" %}
+{% block content %}
+
+
+
+{% macro render_org(org_form) %}
+<div class="jumbotron">
+    <div class="jumbotron">
+        <h1>{{ org_form.name }}</h1>
+        <p>{{ org_form.description }}</p>
+    </div>
+</div>
+{% endmacro %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="page-header">
+                <h1>Organization Selection.</h1>
+                {% for i in range(10) %}
+                    {{ render_field(i) }}
+                {% endfor %}
+            </div>
+        </div>
+        <a href={{ url_for('neworg') }} class="btn btn-default btn-lg" role="button">New Org</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% extends "navbar.html" %}
+{% block content %}
+{% from "macros.html" import render_form, render_field %}
+{{ render_form(form, form_name)}}
+{% endblock %}

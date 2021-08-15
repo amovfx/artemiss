@@ -2,10 +2,12 @@
 from mongoengine import Document, EmailField, StringField,  ObjectIdField, ReferenceField, EmbeddedDocumentField, ListField, EmbeddedDocument, IntField
 from flask_mongoengine.wtf import model_form
 from flask_wtf import FlaskForm
+from flask_login import UserMixin
+
 class Organization(Document):
     pass
 
-class Agent(Document):
+class Agent(Document, UserMixin):
     """
 
     Agent Model contains data for a single login and a record of the essential information
@@ -71,9 +73,10 @@ class Organization(Document):
 
     name = StringField(required=True)
     description = StringField(required=True)
-    members = ListField(ReferenceField(Agent))
+    creator = ObjectIdField(required=True)
 
     #group communications
+    members = ListField(ReferenceField(Agent))
     posts = ListField(ReferenceField(Post))
     expenses = ListField(ReferenceField(Expense))
 

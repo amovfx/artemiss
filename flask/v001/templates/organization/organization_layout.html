@@ -15,14 +15,19 @@
 <div class="container">
     <div class="row">
         <div class="col">
-            <div class="page-header">
-                <h1>Organization Selection.</h1>
-                {% for org in orgs %}
-                    {{ render_org(org) }}
-                {% endfor %}
-            </div>
+            <h2>Agent {{ id }} is logged in</h2>
         </div>
-        <a href={{ url_for('neworg') }} class="btn btn-default btn-lg" role="button">New Org</a>
+        <div id="create_group">
+            <div class="col">
+                <div class="page-header">
+                    <h1>Organization Selection.</h1>
+                    {% for org in orgs %}
+                        {{ render_org(org) }}
+                    {% endfor %}
+                </div>
+            </div>
+            <a href={{ url_for('neworg') }} class="btn btn-default btn-lg" role="button">New Org</a>
+        </div>
     </div>
 </div>
 {% endblock %}

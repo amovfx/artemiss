@@ -2,16 +2,16 @@ from flask import Blueprint, request, redirect, url_for, render_template, sessio
 
 from models.forms import Organization, OrganizationForm
 
-orgs = Blueprint('orgs', __name__)
+orgs_bp = Blueprint('orgss', __name__)
 
 
-@orgs.route('/orgs/', methods = ["GET", "POST"])
+@orgs_bp.route('/orgs/', methods = ["GET", "POST"])
 def orgs():
     return render_template("organization/organization_layout.html",
                            orgs=Organization.objects())
 
 
-@orgs.route('/orgs/new/', methods = ["GET", "POST"])
+@orgs_bp.route('/orgs/new/', methods = ["GET", "POST"])
 def neworg():
     form = OrganizationForm()
     if request.method == 'POST':

@@ -15,7 +15,7 @@ def login():
             session['id'] = existingUser.id
             return redirect(url_for('orgs'), id="MyId")
 
-    return render_template("agents/agent_login.html", title="Login")
+    return render_template("agents/agents/templates/agent_login.html", title="Login")
 
 @auth.route('/register', methods = ["GET", "POST"])
 def register():
@@ -24,4 +24,4 @@ def register():
         agent.save()
         return redirect(url_for('login'))
 
-    return render_template("agents/agent_create.html", title="Register")
+    return render_template("agents/agents/templates/agent_create.html", title="Register")

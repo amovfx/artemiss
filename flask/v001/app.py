@@ -1,15 +1,8 @@
 import os
 
-from flask import (Flask,
-                   render_template,
-                   redirect,
-                   url_for,
-                   request,
-                   session)
+from flask import (Flask)
 
 from flask_mongoengine import MongoEngine
-
-from models.forms import Agent, OrganizationForm, Organization
 
 app = Flask(__name__)
 
@@ -27,14 +20,16 @@ mongo_db = MongoEngine(app=app)
 
 #Register views
 
-from views.main import main as main_blueprint
-app.register_blueprint(main_blueprint)
 
-from views.agent import auth as auth_blueprint
+
+from views.agents.agent import auth as auth_blueprint
 app.register_blueprint(auth_blueprint)
 
-from views.orgs import orgs as org_blueprint
+from views.organization.orgs import orgs as org_blueprint
 app.register_blueprint(org_blueprint)
+
+from views.landing.landing import landing as landing_blueprint
+app.register_blueprint(landing_blueprint)
 
 
 

@@ -2,17 +2,17 @@ from flask import Blueprint, request, redirect, url_for, render_template, sessio
 
 from models.forms import Organization, OrganizationForm
 
-orgs_bp = Blueprint('orgss', __name__)
+orgs = Blueprint('orgs', __name__, template_folder='templates')
 
 
-@orgs_bp.route('/orgs/', methods = ["GET", "POST"])
-def orgs():
-    return render_template("organization/organization_layout.html",
+@orgs.route('/orgs/', methods = ["GET", "POST"])
+def org_browse():
+    return render_template("organization_layout.html",
                            orgs=Organization.objects())
 
 
-@orgs_bp.route('/orgs/new/', methods = ["GET", "POST"])
-def neworg():
+@orgs.route('/orgs/new/', methods = ["GET", "POST"])
+def create_org():
     form = OrganizationForm()
     if request.method == 'POST':
         print ("POSTING:")
@@ -26,6 +26,6 @@ def neworg():
         data.save()
         return redirect(url_for('orgs'))
 
-    return render_template("organization/organization_create.html",
+    return render_template("organization_create.html",
                            form=form,
                            form_name="Organization")

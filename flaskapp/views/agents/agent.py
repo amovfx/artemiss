@@ -3,7 +3,7 @@ from flask import Blueprint, request, redirect, url_for, render_template, sessio
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flaskapp.models.agent import Agent, AgentForm
-from flaskapp.utilities import ResponseCode
+from flaskapp.utilities import ResponseCode, ResponseMessages
 
 auth = Blueprint('auth', __name__, template_folder='templates')
 
@@ -17,12 +17,16 @@ def login():
 
         existingUser = Agent.objects(email=request.form['email']).first()
         if not existingUser:
-            flash("User does not exist!", category="warning")
+            flash(ResponseMessages[ResponseCode.NOUSER],
+                  category="warning")
+
             return reroute('auth.register',
                            ResponseCode.NOUSER.value)
 
         if not check_password_hash(existingUser['password'], request.form['password']):
-            flash("Password is wrong.", category="danger")
+            flash(ResponseMessages[ResponseCode.BADPASSWORD],
+                  category="danger")
+
             return reroute('auth.login',
                            ResponseCode.BADPASSWORD.value)
 

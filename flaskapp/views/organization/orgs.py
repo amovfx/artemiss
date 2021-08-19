@@ -1,6 +1,5 @@
 from flask import Blueprint, request, redirect, url_for, render_template, session
-
-from models.forms import Organization, OrganizationForm
+from flaskapp.models.orgs import Organization, OrganizationForm
 
 orgs = Blueprint('orgs', __name__, template_folder='templates')
 
@@ -19,12 +18,12 @@ def create_org():
         data = Organization()
         data.name = request.form["name"]
         data.description = request.form["description"]
-        if 'id' in session.keys():
-            data.creator = session['id']
-        else:
-            return 'No Session ID', 400
+        # if 'id' in session.keys():
+        #     data.creator = session['id']
+        # else:
+        #     return 'No Session ID', 400
         data.save()
-        return redirect(url_for('orgs'))
+        return redirect(url_for('orgs.org_browse'))
 
     return render_template("organization_create.html",
                            form=form,

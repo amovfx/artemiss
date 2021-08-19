@@ -3,6 +3,15 @@ from flask_mongoengine.wtf import model_form
 from flask_wtf import FlaskForm
 from flask_login import UserMixin
 
+class Agent(Document):
+    pass
+
+class Post(Document):
+    pass
+
+class Expense(Document):
+    pass
+
 class Organization(Document):
 
     """
@@ -13,7 +22,7 @@ class Organization(Document):
 
     name = StringField(required=True)
     description = StringField(required=True)
-    creator = ObjectIdField(required=True)
+    creator = ObjectIdField()
 
     #group communications
     members = ListField(ReferenceField(Agent))

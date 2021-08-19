@@ -17,7 +17,7 @@ class Agent(Document, UserMixin):
     needed for creating tap root bitcoin multi-sig wallets.
 
     """
-    email = StringField(required=True, unique=True)
+    email = EmailField(required=True, unique=True)
     password = StringField(required=True)
 
     organizations = ListField(ReferenceField(Organization))

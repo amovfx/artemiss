@@ -3,7 +3,7 @@ services:
     flask-server:
         container_name: flask_app
         build:
-          context: ./flask/
+          context: flaskapp/
           dockerfile: Dockerfile
         command: ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]
         restart: unless-stopped
@@ -77,9 +77,9 @@ services:
 #        ports:
 #            - 1337:80
 #        depends_on:
-#            - flask-server
+#            - flaskapp-server
 #        links:
-#            - flask-server
+#            - flaskapp-server
 
 
 networks:

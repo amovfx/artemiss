@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash
 
 
 
-class FlaskTestCase(unittest.TestCase):
+class TestAgent(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -51,7 +51,7 @@ class FlaskTestCase(unittest.TestCase):
         response = tester.post('/login',
                                data=self.post_data)
 
-        self.assertEqual(ResponseCode.OK.value,
+        self.assertEqual(ResponseCode.CREATED.value,
                          response.status_code)
 
     def test_user_doesnt_exist(self):
@@ -68,7 +68,7 @@ class FlaskTestCase(unittest.TestCase):
         response = tester.post('/login',
                                data=post_data)
 
-        self.assertEqual(ResponseCode.NOUSER.value,
+        self.assertEqual(ResponseCode.USER_DOES_NOT_EXIST.value,
                          response.status_code)
 
 
@@ -89,7 +89,7 @@ class FlaskTestCase(unittest.TestCase):
         response = tester.post('/login',
                                data=post_data)
 
-        self.assertEqual(ResponseCode.BADPASSWORD.value,
+        self.assertEqual(ResponseCode.BAD_PASSWORD.value,
                          response.status_code)
 
 

@@ -17,26 +17,27 @@ def login():
 
         existingUser = Agent.objects(email=request.form['email']).first()
         if not existingUser:
-            flash(ResponseMessages[ResponseCode.NOUSER],
+            flash(ResponseMessages[ResponseCode.USER_DOES_NOT_EXIST],
                   category="warning")
 
             return reroute('auth.register',
-                           ResponseCode.NOUSER.value)
+                           ResponseCode.USER_DOES_NOT_EXIST.value)
 
         if not check_password_hash(existingUser['password'], request.form['password']):
-            flash(ResponseMessages[ResponseCode.BADPASSWORD],
+            flash(ResponseMessages[ResponseCode.BAD_PASSWORD],
                   category="danger")
 
             return reroute('auth.login',
-                           ResponseCode.BADPASSWORD.value)
+                           ResponseCode.BAD_PASSWORD.value)
 
 
         #session.permanent = True
         #session['id'] = existingUser.id
         return reroute('orgs.org_browse',
-                        ResponseCode.OK.value)
+                        ResponseCode.CREATED.value)
 
-    return render_template("agent_login.html", title="Login")
+    return render_template("agent_login.html",
+                           title="Login")
 
 @auth.route('/register', methods = ["GET", "POST"])
 def register():

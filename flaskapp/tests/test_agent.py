@@ -27,7 +27,7 @@ class TestAgent(unittest.TestCase):
         User.save()
 
     #test if login page loads
-    def test_login(self):
+    def test_login_page(self):
         """
 
             Test if login page loads
@@ -36,7 +36,7 @@ class TestAgent(unittest.TestCase):
         tester = flaskapp.test_client()
         response = tester.get('/login',
                               content_type='html/text')
-        self.assertEqual(ResponseCode.OK.value,
+        self.assertEqual(ResponseCode.OK.value.code,
                          response.status_code)
 
 
@@ -51,7 +51,7 @@ class TestAgent(unittest.TestCase):
         response = tester.post('/login',
                                data=self.post_data)
 
-        self.assertEqual(ResponseCode.CREATED.value,
+        self.assertEqual(ResponseCode.CREATED.value.code,
                          response.status_code)
 
     def test_user_doesnt_exist(self):
@@ -68,7 +68,7 @@ class TestAgent(unittest.TestCase):
         response = tester.post('/login',
                                data=post_data)
 
-        self.assertEqual(ResponseCode.USER_DOES_NOT_EXIST.value,
+        self.assertEqual(ResponseCode.USER_DOES_NOT_EXIST.value.code,
                          response.status_code)
 
 
@@ -84,12 +84,10 @@ class TestAgent(unittest.TestCase):
         post_data['email'] = self.email
         post_data['password'] = "different_password"
 
-        print(post_data)
-
         response = tester.post('/login',
                                data=post_data)
 
-        self.assertEqual(ResponseCode.BAD_PASSWORD.value,
+        self.assertEqual(ResponseCode.BAD_PASSWORD.value.code,
                          response.status_code)
 
 

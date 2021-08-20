@@ -1,16 +1,46 @@
+from dataclasses import dataclass
 from enum import Enum, unique
+
+from flask import redirect, url_for, flash
+
+
+
+
+
+@unique
+class BootStrapMsgCategory(Enum):
+    DANGER="danger"
+    WARNING="warning"
+    PRIMARY="primary"
+
+@dataclass
+class ResponseData():
+    code: int
+    message: str
+    category: BootStrapMsgCategory
+
+    def __post_init__(self):
+        self.category = self.category.value
+
 
 @unique
 class ResponseCode(Enum):
     # INFORMATIONAL RESPONSES (100–199)
-    CONTINUE = 100
+    CONTINUE = ResponseData(code=100,
+                            message="Continue",
+                            category=BootStrapMsgCategory.PRIMARY)
     SWITCHING_PROTOCOL = 101
     PROCESSING = 102
     EARLY_HINTS = 103
 
     # SUCCESSFUL RESPONSES (200–299)
-    OK = 200
-    CREATED = 201
+    OK = ResponseData(code=200,
+                        message="OK.",
+                        category=BootStrapMsgCategory.PRIMARY)
+
+    CREATED = ResponseData(code=201,
+                            message="Member created.",
+                            category=BootStrapMsgCategory.PRIMARY)
     ACCEPTED = 202
     NON_AUTHORITATIVE_INFORMATION = 203
     NO_CONTENT = 204
@@ -61,8 +91,18 @@ class ResponseCode(Enum):
     TOO_MANY_REQUESTS = 429
     REQUEST_HEADER_FIELDS_TOO_LARGE = 431
     UNAVAILABLE_FOR_LEGAL_REASONS = 451
-    USER_DOES_NOT_EXIST = 461
-    BAD_PASSWORD = 462
+
+    USER_ALREADY_EXISTS = ResponseData(code=460,
+                            message="Member already exists.",
+                            category=BootStrapMsgCategory.WARNING)
+
+    USER_DOES_NOT_EXIST = ResponseData(code=461,
+                            message="Member does not exist.",
+                            category=BootStrapMsgCategory.WARNING)
+
+    BAD_PASSWORD = ResponseData(code=462,
+                            message="Bad password for member.",
+                            category=BootStrapMsgCategory.WARNING)
 
     # SERVER ERRORS (500–599)
     INTERNAL_SERVER_ERROR = 500
@@ -77,7 +117,11 @@ class ResponseCode(Enum):
     NOT_EXTENDED = 510
     NETWORK_AUTHENTICATION_REQUIRED = 511
 
-ResponseMessages = {
-    ResponseCode.BAD_PASSWORD : "Bad Password",
-    ResponseCode.USER_DOES_NOT_EXIST : "User does not exist"
-}
+
+
+def reroute(endpoint, response_code):
+    response_data = response_code.value
+    flash(response_data.message,
+          category=response_data.category)
+
+    return redirect(url_for(endpoint), response_data.code)

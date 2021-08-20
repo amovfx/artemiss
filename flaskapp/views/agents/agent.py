@@ -3,12 +3,9 @@ from flask import Blueprint, request, redirect, url_for, render_template, sessio
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flaskapp.models.agent import Agent, AgentForm
-from flaskapp.utilities import ResponseCode, ResponseMessages
+from flaskapp.utilities import ResponseCode, reroute
 
 auth = Blueprint('auth', __name__, template_folder='templates')
-
-def reroute(endpoint, response_code):
-    return redirect(url_for(endpoint), response_code)
 
 @auth.route('/login', methods = ["GET","POST"])
 def login():
@@ -17,24 +14,18 @@ def login():
 
         existingUser = Agent.objects(email=request.form['email']).first()
         if not existingUser:
-            flash(ResponseMessages[ResponseCode.USER_DOES_NOT_EXIST],
-                  category="warning")
-
             return reroute('auth.register',
-                           ResponseCode.USER_DOES_NOT_EXIST.value)
+                           ResponseCode.USER_DOES_NOT_EXIST)
 
         if not check_password_hash(existingUser['password'], request.form['password']):
-            flash(ResponseMessages[ResponseCode.BAD_PASSWORD],
-                  category="danger")
-
             return reroute('auth.login',
-                           ResponseCode.BAD_PASSWORD.value)
+                           ResponseCode.BAD_PASSWORD)
 
 
         #session.permanent = True
         #session['id'] = existingUser.id
         return reroute('orgs.org_browse',
-                        ResponseCode.CREATED.value)
+                        ResponseCode.CREATED)
 
     return render_template("agent_login.html",
                            title="Login")
@@ -48,19 +39,19 @@ def register():
 
         existingUser = Agent.objects(email=email).first()
         if existingUser:
-            flash("That email exists!", category="warning")
-            return redirect(url_for('auth.register'))
+            return reroute('auth.register',
+                           ResponseCode.USER_ALREADY_EXISTS)
 
         if password != verified_password:
-            flash("Passwords dont match!", category="warning")
-            return redirect(url_for('auth.register'))
-
-
+            return reroute('auth.register',
+                           ResponseCode.BAD_PASSWORD)
 
         agent = Agent(email=email,
-                      password=generate_password_hash(password, method='sha256'))
+                      password=generate_password_hash(password,
+                                                      method='sha256'))
         agent.save()
 
         return redirect(url_for('auth.login'))
 
-    return render_template("agent_create.html", title="Register")
+    return render_template("agent_create.html",
+                           title="Register")

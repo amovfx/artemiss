@@ -28,3 +28,9 @@ def create_org():
     return render_template("organization_create.html",
                            form=form,
                            form_name="Organization")
+
+
+@orgs.route('/orgs/<org_id>', methods = ['GET'])
+def org(org_id):
+    return render_template("org.html",
+                           id=org_id)

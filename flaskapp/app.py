@@ -24,6 +24,9 @@ app.register_blueprint(org_blueprint)
 from flaskapp.views.landing.landing import landing as landing_blueprint
 app.register_blueprint(landing_blueprint)
 
+from flaskapp.views.feed.feed import feed as feed_blueprint
+app.register_blueprint(feed_blueprint)
+
 
 
 

@@ -26,9 +26,10 @@ class TestOrganization(unittest.TestCase):
 
         MockOrg = Organization(name="Pet Insurance",
                                description="A co-op for pets!")
+        cls.Org = MockOrg
         MockOrg.save()
 
-    def test_organization_page(self):
+    def test_organization_browser(self):
         """
 
         Test the loading of the organization page
@@ -47,7 +48,12 @@ class TestOrganization(unittest.TestCase):
     def test_organization_page(self):
         """
 
-
+        Test the loading of the organization page.
         :return:
         """
-        pass
+        tester = flaskapp.test_client()
+        response = tester.get(f'/orgs/{str(self.Org.id)}',
+                              content_type='html/text')
+
+        self.assertEqual(ResponseCode.OK.value.code,
+                         response.status_code)

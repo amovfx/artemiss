@@ -1,12 +1,14 @@
 from flask import Blueprint, request, redirect, url_for, render_template, session
 from flaskapp.models.orgs import Organization, OrganizationForm
 
-orgs = Blueprint('orgs', __name__, template_folder='templates')
+orgs = Blueprint('orgs',
+                 __name__,
+                 template_folder='templates')
 
 
 @orgs.route('/orgs/', methods = ["GET", "POST"])
 def org_browse():
-    return render_template("organization_layout.html",
+    return render_template("organization_browser.html",
                            orgs=Organization.objects())
 
 
@@ -33,4 +35,5 @@ def create_org():
 @orgs.route('/orgs/<org_id>', methods = ['GET'])
 def org(org_id):
     return render_template("org.html",
-                           id=org_id)
+                           org_id=org_id,
+                           org=org)

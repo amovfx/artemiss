@@ -1,36 +1,76 @@
-{% extends "navbar.html" %}
+<!-- {% extends "navbar.html" %} -->
 {% block content %}
 
-
-
-
-
 {% macro render_org(org_data) %}
-<div class="container container-flex bg-light m-1">
-    <div class="row">
-        <div class="col">
-            <h5>{{ org_data.name }}</h5>
-            <p>{{ org_data.description}}</p>
-        </div>
-        <div class="col-1">
-            <a class="btn btn-block btn-primary" style="display: block; width: 100%; height:100%; font-size:large" href="{{ url_for('orgs.org', org_id=org_data.id, org=org_data) }}">
-                <span class="glyphicon glyphicon-chevron-right" style="font-size: 10px;"></span>
-            </a>
+<!-- This is tailwind css -->
+<div class="shadow p-3 m-5 bg-white rounded">
+    <div class="p-1.5 border-gray-300 border-opacity-100  ">
+        <div id="OrganizationContainer" title="" class="flex p-2.5 border-gray-300 border-opacity-100">
+            <div id="OrganizationInfo" title="" class="grid w-4/5 border-gray-300 border-opacity-100 ">
+                <div id="Group Details Container" title="" class="grid grid-cols-1 justify-items-start place-content-center p-1 border-gray-300 border-opacity-100 ">
+                    <div id="Card Title Container" title="" class="text-left border-gray-300 border-opacity-100 ">
+                        <h1 id="GroupName" title="" class="text-blue-800 text-opacity-100 font-sans text-2xl font-semibold text-center border-gray-300 border-opacity-100 " style="min-width:10px">
+                            {{org_data.name}}</h1>
+                    </div>
+                    <div id="Group description cont" title="" class="pt-3 border-gray-300 border-opacity-100 ">
+                        <p id="" title="" class="text-gray-800 text-opacity-80 font-sans text-sm font-normal border-gray-300 border-opacity-100 " style="min-width:10px">
+                            {{org_data.description}}</p>
+                    </div>
+                    <div id="Group Policy Container" class="border-gray-300 border-opacity-100">
+                        <p class="py-2 text-gray-800 text-opacity-100 font-sans text-xs font-extralight border-gray-300 border-opacity-100 " style="min-width:10px">The policy of M of N.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex self-center w-1/5 p-1 border-gray-300 border-opacity-100 ">
+                <label class="text-gray-800 text-opacity-100 font-sans text-sm font-normal border-gray-300 border-opacity-100 " style="min-width:10px">Pop: 234</label>
+            </div>
         </div>
     </div>
+
 </div>
 {% endmacro %}
 
-<div class="container mt-5">
-    <div class="d-flex flex-row">
-        <div class="col flex-grow-1" id="create_group">
+<div class="container">
+    <div class="row">
+        <div class="col-8">
             {% for org in orgs %}
                 {{ render_org(org) }}
             {% endfor %}
         </div>
-        <div class="col-3 bg-light" height=200>
-            <a href={{ url_for('orgs.create_org') }} class="btn btn-default btn-lg" role="button">New Org</a>
+        <div class="col-2">
+            <div class="shadow sticky" height=200>
+        <a href={{ url_for('orgs.create_org') }} class="btn btn-default btn-lg" role="button">New Org</a>
         </div>
+            </div>
+
     </div>
+
+
 </div>
+
+<style>
+
+    .feed {
+
+    }
+.flexbox-wrapper {
+  display: flex;
+  overflow: auto;
+  height: 200px;          /* Not necessary -- for example only */
+}
+.regular {
+  background-color: blue; /* Not necessary -- for example only */
+  height: 600px;          /* Not necessary -- for example only */
+}
+div.sticky {
+
+  position: -webkit-sticky;
+  position: sticky;
+  top:120;
+  background-color: dark;
+  padding: 10px;
+  font-size: 20px;
+}
+
+</style>
 {% endblock %}

@@ -20,18 +20,7 @@
 {% endmacro %}
 
 
-<template id="post_template">
-    <div class="container container-flex bg-light m-1">
-        <div class="row">
-            <div class="col p-1">
-                <a href="" style="text-decoration:none" id="org_link">
-                    <h5 id="title"></h5>
-                </a>
-                <p id="description"></p>
-            </div>
-        </div>
-    </div>
-</template>
+
 
 <div class="row">
     <div class="col-8" >
@@ -57,16 +46,6 @@
 
 <style>
 
-
-.flexbox-wrapper {
-  display: flex;
-  overflow: auto;
-  height: 200px;          /* Not necessary -- for example only */
-}
-.regular {
-  background-color: blue; /* Not necessary -- for example only */
-  height: 600px;          /* Not necessary -- for example only */
-}
 div.sticky {
 
   position: -webkit-sticky;
@@ -77,6 +56,19 @@ div.sticky {
 }
 
 </style>
+
+<template id="post_template">
+    <div class="container container-flex bg-light m-1">
+        <div class="row">
+            <div class="col p-1">
+                <a href="" style="text-decoration:none" id="org_link">
+                    <h5 id="title"></h5>
+                </a>
+                <p id="description"></p>
+            </div>
+        </div>
+    </div>
+</template>
 
 <script>
     var scroller = document.querySelector("#scroller");
@@ -97,6 +89,7 @@ div.sticky {
                     let template_clone = template.content.cloneNode(true);
                     template_clone.querySelector("#title").innerHTML = `${data[i]["name"]}`;
                     template_clone.querySelector("#description").innerHTML = `${data[i]["description"]}`;
+                    template_clone.querySelector("#org_link").href = `/orgs/${data[i]["id"]}`;
                     scroller.append(template_clone);
                     counter += 1;
                 }
@@ -123,9 +116,6 @@ div.sticky {
 
     // Call the loadItems function
     loadItems();
-
-
-
     });
 
 // Instruct the IntersectionObserver to watch the sentinel

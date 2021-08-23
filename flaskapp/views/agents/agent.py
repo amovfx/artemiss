@@ -53,5 +53,5 @@ def register():
 
         return redirect(url_for('auth.login'))
 
-    return render_template("agent_create.html",
+    return render_template("agent_register.html",
                            title="Register")

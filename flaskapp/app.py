@@ -40,6 +40,7 @@ Organization routes to view and create.
 
 
 
+
 if __name__ == '__main__':
     app.config['MONGODB_SETTINGS'] = {
         'db': os.environ['MONGO_DATABASE'],

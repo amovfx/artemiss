@@ -7,10 +7,11 @@ feed = Blueprint('feed',
 
 @feed.route('/feed/create', methods = ["GET", "POST"])
 def create_post():
-    return 'Creating Post'
+    print("Feed")
+    return render_template("post.html")
 
 
 @feed.route('/feed/', methods = ["GET"])
 def load_posts():
-    return 'Loading posts'
+    return "Poop"
 

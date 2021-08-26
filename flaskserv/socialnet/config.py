@@ -10,10 +10,12 @@ class TestConfig(DefaultConfig):
     DEBUG = True
     TESTING = True
     WTF_CSRF_ENABLED = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///testing.db'
 
 class DevelopmentConfig(DefaultConfig):
     DEBUG = True
 
 
 class ProductionConfig(DefaultConfig):
+    #from docker
     SQLALCHEMY_DATABASE_URI = 'sqlite://root:root@db/main'

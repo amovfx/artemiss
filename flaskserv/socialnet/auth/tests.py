@@ -1,17 +1,41 @@
 from flask import url_for
 
 from flaskserv.socialnet.models import User
-from flaskserv.socialnet.auth.views import LoginForm
+from flaskserv.socialnet.auth.views import LoginForm, RegisterForm
 
 from flaskserv.socialnet.test_base import TestBaseCase
 class TestRegistration(TestBaseCase):
 
     def setUp(self):
-        super()
+        super().setUp()
         self.post_data = {"name": "Erica",
                             "email": "Erica@example.com",
                            "password": "bad_password",
                            "confirm": "bad_password"}
+
+    def test_registration_form(self):
+        register_form = RegisterForm(name="Alice",
+                                     email="Alice@example.com",
+                                     password="very_bad_password",
+                                     confirm="very_bad_password")
+
+        self.assertTrue(register_form.validate())
+
+    def test_registration_form_password_mismatch(self):
+        register_form = RegisterForm(name="Alice",
+                                     email="Alice@example.com",
+                                     password="very_bad_password",
+                                     confirm="bad_confirmation")
+
+        self.assertFalse(register_form.validate())
+
+    def test_login_form(self):
+        login_form = LoginForm(name="Bob",
+                               password="very_bad_password")
+
+        self.assertTrue(login_form.validate())
+
+
 
     def test_registration_page(self):
         """

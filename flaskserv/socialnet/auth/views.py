@@ -42,10 +42,10 @@ def login():
 
                 return redirect(url_for('browser.tribes'))
             else:
-                return "user doesn't exist", 400
+                return "User does not exist", 400
 
         else:
-            return "user doesn't exist", 400
+            return "Bad Form", 400
 
     return render_template("login.html",
                            title="Login",
@@ -67,21 +67,22 @@ def register():
     :return:
     """
     form = RegisterForm(request.form)
-    if form.validate_on_submit():
-        if request.method == 'POST':
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            name = request.form.get("name")
             email = request.form.get("email")
             password = request.form.get("password")
             verified_password = request.form.get("confirm")
 
             existingUser = User.query.filter_by(email=email).first()
             if existingUser:
-                return redirect(url_for('auth.login'),200)
+                return redirect(url_for('auth.login'), code=302)
 
             if password != verified_password:
-                return redirect(url_for('auth.register'),200)
+                return redirect(url_for('auth.register'),302)
 
             user = User(email=email,
-                         name=email,
+                         name=name,
                          password=password)
 
             db.session.add(user)
@@ -90,7 +91,10 @@ def register():
             login_user(user=user,
                        remember=True)
 
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('browser.tribes'))
+        else:
+            print (form.errors)
+            return 'Bad Form', 400
 
     return render_template("register.html",
                            title="Register",

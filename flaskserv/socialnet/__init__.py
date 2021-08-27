@@ -25,9 +25,11 @@ def create_app(config_class=DevelopmentConfig):
 
     from .auth.views import auth_bp
     from .landing.views import landing_bp
+    from .browser.views import browser_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(landing_bp)
+    app.register_blueprint(browser_bp)
 
     db.create_all(app=app)
 
@@ -35,7 +37,7 @@ def create_app(config_class=DevelopmentConfig):
 
 
 
-from .auth.model import User
+from .models import User
 
 @login_manager.user_loader
 def load_user(user_id):

@@ -3,7 +3,7 @@ import os
 class DefaultConfig(object):
     DEBUG = False
     SECRET_KEY = '94a02f87629b69284e7d566f18ff9eba'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///development.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///db/development.db'
 
 
 class TestConfig(DefaultConfig):
@@ -11,7 +11,7 @@ class TestConfig(DefaultConfig):
     TESTING = True
     LOGIN_DISABLED = True
     WTF_CSRF_ENABLED = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///testing.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///db/testing.db'
 
 class DevelopmentConfig(DefaultConfig):
     DEBUG = True

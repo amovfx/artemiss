@@ -14,7 +14,7 @@ from flask_login import (login_user,
 from werkzeug.security import check_password_hash
 
 from .forms import LoginForm, RegisterForm
-from .model import User
+from flaskserv.socialnet.models import User
 
 from flaskserv.socialnet import db
 
@@ -40,7 +40,7 @@ def login():
                     login_user(user=user,
                                remember=True)
 
-                return "You are logged in", 200
+                return redirect(url_for('browser.tribes'))
             else:
                 return "user doesn't exist", 400
 

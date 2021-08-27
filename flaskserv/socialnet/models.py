@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_login import UserMixin
 from flaskserv.socialnet import db
 from werkzeug.security import generate_password_hash
@@ -39,7 +41,9 @@ class Tribe(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, ForeignKey('user.id'))
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
 
+    #content
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
 
@@ -56,6 +60,8 @@ class Post(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, ForeignKey('user.id'))
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
 
+    #content
     title = db.Column(db.String, nullable=False)
     message = db.Column(db.String, nullable=False)

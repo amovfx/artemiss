@@ -94,6 +94,7 @@ def register():
             return redirect(url_for('browser.tribes'))
         else:
             print (form.errors)
+            #Todo: figure out exception handlers.
             return 'Bad Form', 400
 
     return render_template("register.html",

@@ -40,6 +40,11 @@ def generate_tribes(count=10):
     db.session.commit()
 
 if __name__ == '__main__': # pragma: no cover
+    """
+    
+    This is for development only
+    
+    """
     app = create_app()
     db.drop_all()
     with app.app_context():

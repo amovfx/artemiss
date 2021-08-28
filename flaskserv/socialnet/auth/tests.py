@@ -38,6 +38,14 @@ class TestRegistration(TestBaseCase):
 
         self.assertFalse(register_form.validate())
 
+    def test_registration_form_bad_email(self):
+        register_form = RegisterForm(name="Alice",
+                                     email="Alice",
+                                     password="very_bad_password",
+                                     confirm="very_bad_password")
+
+        self.assertFalse(register_form.validate())
+
     def test_login_form(self):
         login_form = LoginForm(name="Bob",
                                password="very_bad_password")

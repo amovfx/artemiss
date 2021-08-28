@@ -3,7 +3,7 @@ import os
 class DefaultConfig(object):
     DEBUG = False
     SECRET_KEY = '94a02f87629b69284e7d566f18ff9eba'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///db/development.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///data/development.db'
 
 
 class TestConfig(DefaultConfig):
@@ -11,7 +11,7 @@ class TestConfig(DefaultConfig):
     TESTING = True
     LOGIN_DISABLED = True
     WTF_CSRF_ENABLED = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///db/testing.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///data/testing.db'
 
 class DevelopmentConfig(DefaultConfig):
     DEBUG = True
@@ -19,4 +19,4 @@ class DevelopmentConfig(DefaultConfig):
 
 class ProductionConfig(DefaultConfig):
     #from docker
-    SQLALCHEMY_DATABASE_URI = 'sqlite://root:root@db/main'
+    SQLALCHEMY_DATABASE_URI = 'sqlite://root:root@data/main'

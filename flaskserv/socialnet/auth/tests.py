@@ -1,9 +1,12 @@
 from flask import url_for
 
+from flaskserv.socialnet import db
 from flaskserv.socialnet.models import User
 from flaskserv.socialnet.auth.views import LoginForm, RegisterForm
 
 from flaskserv.socialnet.test_base import TestBaseCase
+
+
 class TestRegistration(TestBaseCase):
 
     def setUp(self):
@@ -61,7 +64,7 @@ class TestRegistration(TestBaseCase):
                                     follow_redirects=True)
 
         new_user = User.query.filter_by(name=self.post_data['name']).first()
-        self.assertEquals(new_user.name, self.post_data['name'])
+        self.assertEqual(new_user.name, self.post_data['name'])
         self.assertEqual(200,
                          response.status_code)
 
@@ -77,7 +80,7 @@ class TestRegistration(TestBaseCase):
         response = self.client.post("/register",
                                    data = post_data)
 
-        self.assertEquals(302, response.status_code)
+        self.assertEqual(302, response.status_code)
 
     def test_register_bad_confirm(self):
         post_data= self.post_data.copy()
@@ -86,7 +89,7 @@ class TestRegistration(TestBaseCase):
         response = self.client.post("/register",
                                    data = post_data)
 
-        self.assertEquals(400, response.status_code)
+        self.assertEqual(400, response.status_code)
 
 
 
@@ -99,6 +102,12 @@ class TestLogin(TestBaseCase):
         :return:
         """
         super().setUp()
+        for name in ("Alice", "Bob", "Carol"):
+            user = User(name=name,
+                        email=f"{name}@example.com",
+                        password="bad_password")
+            db.session.add(user)
+        db.session.commit()
         self.post_data = {"name": "Alice",
                           "password": "bad_password"}
 
@@ -109,9 +118,8 @@ class TestLogin(TestBaseCase):
 
         """
         name = self.post_data['name']
-        print(name)
         registered_user = User.query.filter_by(name=name).first()
-        self.assertEquals(registered_user.name, name)
+        self.assertEqual(registered_user.name, name)
 
     def test_login_page(self):
         """
@@ -130,10 +138,10 @@ class TestLogin(TestBaseCase):
         Testing a valid login
 
         """
-        print (self.post_data)
+
         response = self.client.post('/login',
                                     data=self.post_data)
-        print (response.data)
+
         self.assertRedirects(response, url_for('browser.tribes'))
 
     def test_user_doesnt_exist(self):
@@ -142,6 +150,7 @@ class TestLogin(TestBaseCase):
         Test if member isn't created in the database
 
         """
+
         post_data = self.post_data.copy()
         post_data['name'] = "Dylan"
 

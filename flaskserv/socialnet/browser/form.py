@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import TextField
+from wtforms import StringField
 from wtforms.validators import DataRequired, Length
 
 class TribeForm(FlaskForm):
@@ -9,8 +9,8 @@ class TribeForm(FlaskForm):
 
     """
 
-    name = TextField('name', validators=[DataRequired()])
-    description = TextField('description', validators=[DataRequired()])
+    name = StringField('name', validators=[DataRequired()])
+    description = StringField('description', validators=[DataRequired()])
 
 
 class PostForm(FlaskForm):
@@ -20,6 +20,6 @@ class PostForm(FlaskForm):
 
     """
 
-    title = TextField('title', validators=[DataRequired()])
-    message = TextField('message', validators=[DataRequired(), Length(min=6, max=10000)])
+    title = StringField('title', validators=[DataRequired()])
+    message = StringField('message', validators=[DataRequired(), Length(min=6, max=10000)])
 

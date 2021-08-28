@@ -45,7 +45,7 @@ def login():
                     login_user(user=user,
                                remember=True)
 
-                    return redirect(url_for('browser.tribes'))
+                    return redirect(url_for('tribes.tribes'))
                 else:
                     return "Bad password", 400
             else:
@@ -94,7 +94,7 @@ def register():
             login_user(user=user,
                        remember=True)
 
-            return redirect(url_for('browser.tribes'))
+            return redirect(url_for('tribes.tribes'))
         else:
             print (form.errors)
             #Todo: figure out exception handlers.

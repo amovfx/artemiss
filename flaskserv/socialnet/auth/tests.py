@@ -160,7 +160,7 @@ class TestLogin(TestBaseCase):
         response = self.client.post('/login',
                                     data=self.post_data)
 
-        self.assertRedirects(response, url_for('browser.tribes'))
+        self.assertRedirects(response, url_for('tribes.tribes'))
 
     def test_bad_password(self):
         """

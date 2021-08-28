@@ -1,5 +1,7 @@
 import random
 
+from werkzeug.security import generate_password_hash
+
 from flaskserv.socialnet import db, create_app
 from flaskserv.socialnet.models import User, Tribe, Post
 

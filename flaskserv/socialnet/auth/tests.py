@@ -11,10 +11,16 @@ class TestRegistration(TestBaseCase):
 
     def setUp(self):
         super().setUp()
+
         self.post_data = {"name": "Erica",
                             "email": "Erica@example.com",
                            "password": "bad_password",
                            "confirm": "bad_password"}
+        user_data = self.post_data.copy()
+        user_data.pop("confirm")
+        existing_user = User(**user_data)
+        db.session.add(existing_user)
+        db.session.commit()
 
     def test_registration_form(self):
         register_form = RegisterForm(name="Alice",
@@ -51,16 +57,20 @@ class TestRegistration(TestBaseCase):
         self.assertEqual(200,
                          response.status_code)
 
-    def test_register_user(self):
+    def test_register_new_user(self):
         """
 
         Register a user and check if they are in the database.
         post_data is set in the setUp function.
 
         """
+        post_data = {"name": "NewUser",
+                     "email": "NewUser@example.com",
+                     "password": "bad_password",
+                     "confirm": "bad_password"}
 
         response = self.client.post("/register",
-                                   data = self.post_data,
+                                    data = post_data,
                                     follow_redirects=True)
 
         new_user = User.query.filter_by(name=self.post_data['name']).first()
@@ -75,7 +85,7 @@ class TestRegistration(TestBaseCase):
 
         """
         post_data= self.post_data.copy()
-        post_data['name'] = "Alice"
+        post_data['email'] = "Erica@example.com"
 
         response = self.client.post("/register",
                                    data = post_data)
@@ -111,7 +121,7 @@ class TestLogin(TestBaseCase):
         self.post_data = {"name": "Alice",
                           "password": "bad_password"}
 
-    def test_user_exists(self):
+    def test_user_in_db(self):
         """
 
             Test if user is in the database
@@ -144,6 +154,20 @@ class TestLogin(TestBaseCase):
 
         self.assertRedirects(response, url_for('browser.tribes'))
 
+    def test_bad_password(self):
+        """
+
+        Testing a bad password login
+
+        """
+        post_data = self.post_data.copy()
+        post_data['password'] = 'wrong_password'
+        response = self.client.post('/login',
+                                    data=post_data)
+
+        self.assertEqual(response.status_code,400)
+
+
     def test_user_doesnt_exist(self):
         """
 
@@ -159,6 +183,23 @@ class TestLogin(TestBaseCase):
 
         self.assertEqual(400,
                          response.status_code)
+
+
+    def test_logout_page(self):
+        response = self.client.get('/logout',
+                                    content_type='html/text')
+        self.assertEqual(302,
+                         response.status_code)
+
+
+    def test_bad_form(self):
+        response = self.client.post('/login',
+                               data={})
+
+        self.assertEqual(400,
+                         response.status_code)
+
+
 
 
 

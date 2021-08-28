@@ -1,3 +1,4 @@
+import os
 
 from flask import (Blueprint,
                    request,
@@ -12,6 +13,9 @@ from flask_login import (login_user,
                          logout_user)
 
 from werkzeug.security import check_password_hash
+
+if os.environ.get("TESTING"):
+    check_password_hash = lambda x, y: x == y
 
 from .forms import LoginForm, RegisterForm
 from flaskserv.socialnet.models import User
@@ -35,12 +39,15 @@ def login():
         if form.validate_on_submit():
             user = User.query.filter_by(name=request.form['name']).first()
 
+
             if (user is not None):
                 if check_password_hash(user.password, request.form['password']):
                     login_user(user=user,
                                remember=True)
 
-                return redirect(url_for('browser.tribes'))
+                    return redirect(url_for('browser.tribes'))
+                else:
+                    return "Bad password", 400
             else:
                 return "User does not exist", 400
 
@@ -56,7 +63,7 @@ def login():
 def logout():
     logout_user()
     flash('You were logged out.')
-    return redirect(url_for('landing'))
+    return redirect(url_for('landing.landing'))
 
 @auth_bp.route('/register', methods = ["GET", "POST"])
 def register():
@@ -72,7 +79,6 @@ def register():
             name = request.form.get("name")
             email = request.form.get("email")
             password = request.form.get("password")
-            verified_password = request.form.get("confirm")
 
             existingUser = User.query.filter_by(email=email).first()
             if existingUser:

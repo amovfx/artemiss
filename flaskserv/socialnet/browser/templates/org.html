@@ -1,0 +1,18 @@
+{% extends "navbar.html" %}
+{% block content %}
+<div class="row">
+    <div class="col">
+        <div class="col">
+            This is where withdrawl requests will go.
+        </div>
+        <div class="col">
+        </div>
+        </div>
+    <div class="col">
+        <div class="btn-group-vertical m-5 sticky-top">
+            <a href={{ url_for('feed.create_post') }} class="btn btn-primary btn-lg" role="button">New Post</a>
+            <a href={{ url_for('feed.create_post') }} class="btn btn-warning btn-lg" role="button">Expense</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

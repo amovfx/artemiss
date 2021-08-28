@@ -1,8 +1,11 @@
+import os
 from datetime import datetime
 
 from flask_login import UserMixin
 from flaskserv.socialnet import db
 from werkzeug.security import generate_password_hash
+if os.environ.get("TESTING"):
+    generate_password_hash = lambda x : x
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
@@ -23,6 +26,12 @@ class User(db.Model, UserMixin):
 
     tribes = relationship('Tribe', backref='owner')
     posts = relationship('Post', backref='owner')
+
+    def __init__(self, name, email, password):
+        self.name = name
+        self.email = email
+        self.password = generate_password_hash(password)
+
 
     def __repr__(self):
         return '<name - {}>'.format(self.name)

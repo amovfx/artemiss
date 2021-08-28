@@ -7,5 +7,6 @@ landing_bp = Blueprint('landing',
 
 #Landing page
 @landing_bp.route('/')
+@landing_bp.route('/home')
 def landing():
     return render_template("navbar.html")

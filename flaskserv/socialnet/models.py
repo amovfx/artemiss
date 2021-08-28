@@ -33,10 +33,6 @@ class User(db.Model, UserMixin):
         self.password = generate_password_hash(password)
 
 
-    def __repr__(self):
-        return '<name - {}>'.format(self.name)
-
-
 class Tribe(db.Model):
     """
 

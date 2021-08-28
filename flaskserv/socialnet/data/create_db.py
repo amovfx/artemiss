@@ -39,7 +39,7 @@ def generate_tribes(count=10):
 
     db.session.commit()
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     app = create_app()
     db.drop_all()
     with app.app_context():

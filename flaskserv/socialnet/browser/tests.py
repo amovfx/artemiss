@@ -42,6 +42,13 @@ class TestBrowser(TestBaseCase):
         tribe_count = len(Tribe.query.all())
         self.assertEqual(self.tribe_count, tribe_count)
 
+    def test_tribe_page(self):
+
+        response = self.client.get('/tribes/new',
+                                    content_type='html/text')
+        self.assertEqual(200,
+                         response.status_code)
+
 
 
 

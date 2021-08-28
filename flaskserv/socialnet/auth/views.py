@@ -78,9 +78,6 @@ def register():
             if existingUser:
                 return redirect(url_for('auth.login'), code=302)
 
-            if password != verified_password:
-                return redirect(url_for('auth.register'),302)
-
             user = User(email=email,
                          name=name,
                          password=password)

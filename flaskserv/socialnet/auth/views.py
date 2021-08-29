@@ -5,7 +5,7 @@ from flask import (Blueprint,
                    redirect,
                    url_for,
                    render_template,
-                   session,
+                   make_response,
                    flash)
 
 from flask_login import (login_user,
@@ -82,7 +82,12 @@ def register():
 
             existingUser = User.query.filter_by(email=email).first()
             if existingUser:
-                return redirect(url_for('auth.login'), code=302)
+                flash("User already exists.")
+                form.email.errors = ["User already exists"]
+                return render_template("register.html",
+                                       title="Register",
+                                       form=form), 302
+
 
             user = User(email=email,
                          name=name,
@@ -95,12 +100,10 @@ def register():
                        remember=True)
 
             return redirect(url_for('tribes.tribes'))
-        else:
-            print (form.errors)
-            #Todo: figure out exception handlers.
-            return 'Bad Form', 400
 
     return render_template("register.html",
-                           title="Register",
-                           form=form)
+                   title="Register",
+                   form=form)
+
+
 

@@ -1,55 +1,4 @@
-{% extends "navbar.html" %}
-{% block content %}
-
-<div class="row">
-    <div class="col-8" >
-        <!-- this is where the templates are injected my js -->
-        <div id="scroller"></div>
-
-        <!-- this is the intersection observer that makes load calls -->
-        <div class="d-flex justify-content-center mb-3"
-             id="sentinel"
-        >
-            <div class="spinner-boarder" role="status"></div>
-
-        </div>
-    </div>
-    <div class="col-2">
-        <div class="sticky shadow">
-             <a href={{ url_for('browser.create_tribe') }} class="btn btn-default btn-lg" role="button">New Tribe</a>
-        </div>
-    </div>
-</div>
-
-
-<style>
-
-div.sticky {
-
-  position: -webkit-sticky;
-  position: sticky;
-  top: 60px;
-  padding: 10px;
-  font-size: 20px;
-}
-
-</style>
-
-<template id="post_template">
-    <div class="container container-flex bg-light m-1">
-        <div class="row">
-            <div class="col p-1">
-                <a href="" style="text-decoration:none" id="org_link">
-                    <h5 id="title"></h5>
-                </a>
-                <p id="description"></p>
-            </div>
-        </div>
-    </div>
-</template>
-
-<script>
-    var scroller = document.querySelector("#scroller");
+var scroller = document.querySelector("#scroller");
     var template = document.querySelector("#post_template");
 
     var sentinel = document.querySelector("#sentinel");
@@ -98,5 +47,3 @@ div.sticky {
 
 // Instruct the IntersectionObserver to watch the sentinel
 intersectionObserver.observe(sentinel);
-</script>
-{% endblock %}

@@ -52,6 +52,23 @@ class Tribe(db.Model):
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
 
+    # def __init__(self):
+    #     """
+    #     Ingest a flask form, set user to current_user
+    #     """
+    #     pass
+
+    def preview(self):
+        """
+
+        A dict for a limited number of parameters.
+
+        """
+        return dict(name=self.name,
+                    description=self.description,
+                    owner_id=self.owner_id,
+                    created_date=self.created_date)
+
 
 
 class Post(db.Model):

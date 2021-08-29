@@ -1,13 +1,17 @@
+"""
+
+View methods for the tribes database.
+
+"""
+
 from flask import (Blueprint,
                    request,
                    redirect,
                    url_for,
                    render_template,
-                   session,
                    make_response,
                    jsonify)
 
-from flask import g
 from flask_login import login_required, current_user
 
 from flaskserv.socialnet import db
@@ -23,6 +27,11 @@ tribes_bp = Blueprint('tribes',
 @login_required
 @tribes_bp.route('/tribes')
 def tribes():
+    """
+
+    This is where the tribes are displayed.
+
+    """
     return render_template("tribes.html")
 
 
@@ -112,6 +121,3 @@ def load():
             response = make_response(jsonify(get_tribes(counter)), 200)
 
     return response
-
-
-

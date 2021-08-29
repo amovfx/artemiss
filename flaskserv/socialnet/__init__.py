@@ -1,10 +1,15 @@
-import os
+"""
+
+App factory for a basic social net.
+
+"""
 
 from flask import Flask
 
-from flask_login import LoginManager, AnonymousUserMixin
+from flask_login import LoginManager
 
 from flask_sqlalchemy import SQLAlchemy
+from flask_bootstrap import Bootstrap
 from .config import DevelopmentConfig
 
 
@@ -19,18 +24,22 @@ login_manager.login_view = 'auth.login'
 db = SQLAlchemy()
 
 def create_app(config_class=DevelopmentConfig):
+    """
+
+    Flask factory app.
+
+    :param config_class:
+        The class appropriate for the stage of production
+    :return:
+    """
     app = Flask(__name__)
     app.config.from_object(config_class)
     db.init_app(app)
 
-    class Anonymous(AnonymousUserMixin):
-        def __init__(self):
-            self.name = 'Anon'
-            self.email = 'Anon@example.com'
-            self.id = 999999
 
-    login_manager.anonymous_user = Anonymous
     login_manager.init_app(app)
+
+    Bootstrap(app=app)
 
 
 

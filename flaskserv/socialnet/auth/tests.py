@@ -6,22 +6,7 @@ from flaskserv.socialnet.auth.views import LoginForm, RegisterForm
 
 from flaskserv.socialnet.test_base import TestBaseCase
 
-
-class TestRegistration(TestBaseCase):
-
-    def setUp(self):
-        super().setUp()
-
-        self.post_data = {"name": "Erica",
-                            "email": "Erica@example.com",
-                           "password": "bad_password",
-                           "confirm": "bad_password"}
-        user_data = self.post_data.copy()
-        user_data.pop("confirm")
-        existing_user = User(**user_data)
-        db.session.add(existing_user)
-        db.session.commit()
-
+class TestRegistrationForm(TestBaseCase):
     def test_registration_form(self):
         register_form = RegisterForm(name="Alice",
                                      email="Alice@example.com",
@@ -46,11 +31,68 @@ class TestRegistration(TestBaseCase):
 
         self.assertFalse(register_form.validate())
 
+class TestLoginForm(TestBaseCase):
+
     def test_login_form(self):
+        """
+
+        Test a good login form
+
+        """
         login_form = LoginForm(name="Bob",
                                password="very_bad_password")
 
         self.assertTrue(login_form.validate())
+
+    def test_login_form_missing_name(self):
+        """
+
+        Test for a login form with a missing name.
+
+        """
+        login_form = LoginForm(name="",
+                               password="very_bad_password")
+
+        self.assertFalse(login_form.validate())
+
+    def test_login_form_missing_password(self):
+        """
+
+        Test for a login with a missing password.
+
+        """
+        login_form = LoginForm(name="BestName",
+                               password="")
+
+        self.assertFalse(login_form.validate())
+
+    def test_login_form_empty(self):
+        """
+
+        Test for a empty login form.
+
+        """
+        login_form = LoginForm(name="",
+                               password="")
+
+        self.assertFalse(login_form.validate())
+
+
+
+class TestRegistration(TestBaseCase):
+
+    def setUp(self):
+        super().setUp()
+
+        self.post_data = {"name": "Erica",
+                            "email": "Erica@example.com",
+                           "password": "bad_password",
+                           "confirm": "bad_password"}
+        user_data = self.post_data.copy()
+        user_data.pop("confirm")
+        existing_user = User(**user_data)
+        db.session.add(existing_user)
+        db.session.commit()
 
 
 
@@ -107,7 +149,7 @@ class TestRegistration(TestBaseCase):
         response = self.client.post("/register",
                                    data = post_data)
 
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(200, response.status_code)
 
 
 

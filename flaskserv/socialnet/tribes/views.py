@@ -97,8 +97,6 @@ def load():
         :return:
         """
 
-
-
         light_response_objects = []
         tribes_slice = Tribe.query.all()[counter:counter+quantity]
 

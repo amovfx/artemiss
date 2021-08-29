@@ -7,7 +7,17 @@ from flaskserv.socialnet.auth.views import LoginForm, RegisterForm
 from flaskserv.socialnet.test_base import TestBaseCase
 
 class TestRegistrationForm(TestBaseCase):
+    """
+
+    Class to test Registration Form.
+
+    """
     def test_registration_form(self):
+        """
+
+        Test a good form.
+
+        """
         register_form = RegisterForm(name="Alice",
                                      email="Alice@example.com",
                                      password="very_bad_password",
@@ -15,7 +25,38 @@ class TestRegistrationForm(TestBaseCase):
 
         self.assertTrue(register_form.validate())
 
+    def test_registration_form_missing_email(self):
+        """
+
+        Test a missing email.
+
+        """
+        register_form = RegisterForm(name="Alice",
+                                     email="",
+                                     password="very_bad_password",
+                                     confirm="very_bad_password")
+
+        self.assertFalse(register_form.validate())
+
+    def test_registration_form_missing_name(self):
+        """
+
+        Test a good form.
+
+        """
+        register_form = RegisterForm(name="Alice",
+                                     email="",
+                                     password="very_bad_password",
+                                     confirm="very_bad_password")
+
+        self.assertFalse(register_form.validate())
+
     def test_registration_form_password_mismatch(self):
+        """
+
+        Test password mismatch.
+
+        """
         register_form = RegisterForm(name="Alice",
                                      email="Alice@example.com",
                                      password="very_bad_password",
@@ -24,6 +65,11 @@ class TestRegistrationForm(TestBaseCase):
         self.assertFalse(register_form.validate())
 
     def test_registration_form_bad_email(self):
+        """
+
+        Test a bad email.
+
+        """
         register_form = RegisterForm(name="Alice",
                                      email="Alice",
                                      password="very_bad_password",
@@ -79,7 +125,7 @@ class TestLoginForm(TestBaseCase):
 
 
 
-class TestRegistration(TestBaseCase):
+class TestRegistrationRoute(TestBaseCase):
 
     def setUp(self):
         super().setUp()
@@ -153,7 +199,7 @@ class TestRegistration(TestBaseCase):
 
 
 
-class TestLogin(TestBaseCase):
+class TestLoginRoute(TestBaseCase):
 
     def setUp(self):
         """

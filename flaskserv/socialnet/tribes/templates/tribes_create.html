@@ -1,29 +1,8 @@
 {% extends "navbar.html" %}
 {% block content %}
-<h1>Please login</h1>
-<br>
-<form class="form-create-tribe" role="form" method="post" action="">
-  {{ form.csrf_token }}
-  <p>
-    {{ form.name(placeholder="tribe name") }}
-    <span class="error">
-      {% if form.name.errors %}
-        {% for error in form.name.errors %}
-          {{ error }}
-        {% endfor %}
-      {% endif %}
-    </span>
-  </p>
-  <p>
-  {{ form.description(placeholder="Tell us what this is about") }}
-    <span class="error">
-      {% if form.description.errors %}
-        {% for error in form.description.errors %}
-          {{ error }}
-        {% endfor %}
-      {% endif %}
-    </span>
-  </p>
-  <button class="btn btn-sm btn-success" type="submit">Sign in</button>
-</form>
+{{ super() }}
+{% import "bootstrap/wtf.html" as wtf %}
+<div class="container">
+  {{ wtf.quick_form(form) }}
+</div>
 {% endblock %}

@@ -1,8 +1,8 @@
 {% extends "navbar.html" %}
 {% block content %}
-<div class="container-fluid">
+<div class="container">
     <div class="row">
-        <div class="col" >
+        <div class="col-8" >
             <!-- this is where the templates are injected my js -->
             <div id="scroller"></div>
 
@@ -14,7 +14,10 @@
 
             </div>
         </div>
-        <div class="col">
+    </div>
+    <div class="row">
+
+        <div class="col-4">
             <div class="sticky shadow">
                  <a href={{ url_for('tribes.create_tribe') }} class="btn btn-default btn-lg" role="button">New Tribe</a>
             </div>
@@ -37,7 +40,7 @@ div.sticky {
 </style>
 
 <template id="post_template">
-    <div class="container container-flex bg-light m-1">
+    <div class="container bg-light m-1">
         <div class="row">
             <div class="col p-1">
                 <a href="" style="text-decoration:none" id="org_link">

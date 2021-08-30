@@ -27,6 +27,12 @@ tribes_bp = Blueprint('tribes',
 @login_required
 @tribes_bp.route('/tribe/<uuid>')
 def tribe(uuid):
+    """
+
+    The route for the tribe.
+    :param uuid:
+    :return:
+    """
     tribe = Tribe.query.filter_by(uuid=uuid).first()
     return render_template("tribe.html",
                            tribe = tribe)

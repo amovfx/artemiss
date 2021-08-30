@@ -10,25 +10,7 @@ from flaskserv.socialnet.models import User, Tribe, Post
 
 
 
-class TestBrowser(TestBaseCase):
-    """
-
-    Test tribe tribes.
-
-    """
-
-    def setUp(self):
-        """
-
-        For setup we generate some tribes, keep the amount to make sure
-        the db is working correctly.
-
-        """
-        super().setUp()
-        self.tribe_count = 30
-        generate_tribes(self.tribe_count)
-
-
+class TestTribeForm(TestBaseCase):
     def test_tribe_form(self):
         """
 
@@ -53,6 +35,24 @@ class TestBrowser(TestBaseCase):
                              message="The message")
 
         self.assertTrue(post_form.validate())
+
+class TestTribeRoutes(TestBaseCase):
+    """
+
+    Test tribe tribes.
+
+    """
+
+    def setUp(self):
+        """
+
+        For setup we generate some tribes, keep the amount to make sure
+        the db is working correctly.
+
+        """
+        super().setUp()
+        self.tribe_count = 30
+        generate_tribes(self.tribe_count)
 
 
     def test_tribe_count(self):
@@ -144,6 +144,14 @@ class TestBrowser(TestBaseCase):
 
         created_tribe = Tribe.query.filter_by(name="Testing Tribe").first()
         self.assertEqual(created_tribe.name, tribe_name)
+
+    def test_tribe_route(self):
+
+        first_tribe = Tribe.query.all()[0]
+        response = self.client.get(f'/tribe/{first_tribe.uuid}',
+                                    content_type='html/text')
+
+        self.assertEqual(response.status_code, 200)
 
 
 

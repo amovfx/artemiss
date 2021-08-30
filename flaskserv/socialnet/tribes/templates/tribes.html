@@ -1,22 +1,23 @@
 {% extends "navbar.html" %}
 {% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col" >
+            <!-- this is where the templates are injected my js -->
+            <div id="scroller"></div>
 
-<div class="row">
-    <div class="col-8" >
-        <!-- this is where the templates are injected my js -->
-        <div id="scroller"></div>
+            <!-- this is the intersection observer that makes load calls -->
+            <div class="d-flex justify-content-center mb-3"
+                 id="sentinel"
+            >
+                <div class="spinner-boarder" role="status"></div>
 
-        <!-- this is the intersection observer that makes load calls -->
-        <div class="d-flex justify-content-center mb-3"
-             id="sentinel"
-        >
-            <div class="spinner-boarder" role="status"></div>
-
+            </div>
         </div>
-    </div>
-    <div class="col-2">
-        <div class="sticky shadow">
-             <a href={{ url_for('tribes.create_tribe') }} class="btn btn-default btn-lg" role="button">New Tribe</a>
+        <div class="col">
+            <div class="sticky shadow">
+                 <a href={{ url_for('tribes.create_tribe') }} class="btn btn-default btn-lg" role="button">New Tribe</a>
+            </div>
         </div>
     </div>
 </div>
@@ -67,7 +68,7 @@ div.sticky {
                     let template_clone = template.content.cloneNode(true);
                     template_clone.querySelector("#title").innerHTML = `${data[i]["name"]}`;
                     template_clone.querySelector("#description").innerHTML = `${data[i]["description"]}`;
-                    template_clone.querySelector("#org_link").href = `/orgs/${data[i]["id"]}`;
+                    template_clone.querySelector("#org_link").href = `/tribes/${data[i]["id"]}`;
                     scroller.append(template_clone);
                     counter += 1;
                 }

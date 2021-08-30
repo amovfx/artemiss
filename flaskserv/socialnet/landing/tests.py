@@ -1,6 +1,6 @@
 from flaskserv.socialnet.test_base import TestBaseCase
 
-class TestLanding(TestBaseCase):
+class TestLandingRoutes(TestBaseCase):
     def test_index_page(self):
 
         response = self.client.get('/',

@@ -31,8 +31,11 @@ def tribe(uuid):
 
     The route for the tribe.
     :param uuid:
+        This fetches a specific tribe from the db.
     :return:
+        Rendered template.
     """
+
     tribe = Tribe.query.filter_by(uuid=uuid).first()
     return render_template("tribe.html",
                            tribe = tribe)

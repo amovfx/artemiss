@@ -1,4 +1,7 @@
+
 import os
+import uuid
+
 from datetime import datetime
 
 from flask_login import UserMixin
@@ -9,6 +12,10 @@ if os.environ.get("TESTING"):
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
+
+
+def generate_uuid():
+    return uuid.uuid4().hex[:16]
 
 class User(db.Model, UserMixin):
     """
@@ -47,10 +54,18 @@ class Tribe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, ForeignKey('user.id'))
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    uuid = db.Column(db.String, default=generate_uuid, nullable=False)
 
     #content
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
+
+
+
+
+
+
+
 
     # def __init__(self):
     #     """
@@ -67,7 +82,8 @@ class Tribe(db.Model):
         return dict(name=self.name,
                     description=self.description,
                     owner_id=self.owner_id,
-                    created_date=self.created_date)
+                    created_date=self.created_date,
+                    uuid=self.uuid)
 
 
 

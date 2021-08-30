@@ -33,7 +33,7 @@ def generate_tribes(count=10):
     for i in range(count):
         tribe = Tribe(name=f" {i} : {lorem.sentence().split(' ')[0]}",
                       description=lorem.sentence(),
-                      owner_id=random.choice(users).id)
+                      owner=random.choice(users))
 
         db.session.add(tribe)
 

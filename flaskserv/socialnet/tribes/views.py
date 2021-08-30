@@ -25,6 +25,14 @@ tribes_bp = Blueprint('tribes',
                       template_folder='templates')
 
 @login_required
+@tribes_bp.route('/tribe/<uuid>')
+def tribe(uuid):
+    tribe = Tribe.query.filter_by(uuid=uuid).first()
+    return render_template("tribe.html",
+                           tribe = tribe)
+
+
+@login_required
 @tribes_bp.route('/tribes')
 def tribes():
     """

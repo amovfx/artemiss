@@ -70,7 +70,7 @@ div.sticky {
                     let template_clone = template.content.cloneNode(true);
                     template_clone.querySelector("#title").innerHTML = `${data[i]["name"]}`;
                     template_clone.querySelector("#description").innerHTML = `${data[i]["description"]}`;
-                    template_clone.querySelector("#org_link").href = `/tribes/${data[i]["id"]}`;
+                    template_clone.querySelector("#org_link").href = `/tribe/${data[i]["uuid"]}`;
                     scroller.append(template_clone);
                     counter += 1;
                 }

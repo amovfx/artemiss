@@ -10,7 +10,11 @@ from flask_login import LoginManager
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
+from flask_bootstrap.nav import BootstrapRenderer
+from flask_nav import Nav, register_renderer
+
 from .config import DevelopmentConfig
+from .nav import navbar
 
 
 
@@ -40,7 +44,11 @@ def create_app(config_class=DevelopmentConfig):
     login_manager.init_app(app)
 
     Bootstrap(app=app)
-
+    nav = Nav(app=app)
+    register_renderer(app=app,
+                      id='bootstrap',
+                      renderer=BootstrapRenderer)
+    nav.register_element("main_nav_bar", navbar)
 
 
     from .auth.views import auth_bp

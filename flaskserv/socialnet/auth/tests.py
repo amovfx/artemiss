@@ -130,10 +130,11 @@ class TestRegistrationRoute(TestBaseCase):
     def setUp(self):
         super().setUp()
 
-        self.post_data = {"name": "Erica",
-                            "email": "Erica@example.com",
-                           "password": "bad_password",
-                           "confirm": "bad_password"}
+        self.post_data = dict(name="Erica",
+                              email="Erica@example.com",
+                              password="bad_password",
+                              confirm="bad_password")
+
         user_data = self.post_data.copy()
         user_data.pop("confirm")
         existing_user = User(**user_data)

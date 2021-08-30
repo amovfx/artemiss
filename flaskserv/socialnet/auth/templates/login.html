@@ -1,18 +1,17 @@
-{% extends "bootstrap/base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% extends "layout.html" %}
 {% block title %}
 {{ title }}
 {% endblock %}
 {% block content %}
+{{ super() }}
+{% import "bootstrap/wtf.html" as wtf %}
 <div class="container">
   <form class="form-signin" role="form" method="post" action="">
     {{ wtf.quick_form(form) }}
-    <button class="btn btn-sm btn-success" type="submit">Sign in</button>
-
+  </form>
     <div id="register-link" class="text-center">
         <a href={{ url_for('auth.register') }} class="text-info">Register here</a>
     </div>
-  </form>
 </div>
 
 {% endblock %}

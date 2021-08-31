@@ -17,12 +17,12 @@ from sqlalchemy.orm import relationship, backref
 def generate_uuid():
     return uuid.uuid4().hex[:16]
 
-class DataModel(db.Model):
+class DataModelMixin(object):
     id = db.Column(db.Integer, primary_key=True)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     uuid = db.Column(db.String, default=generate_uuid, nullable=False)
 
-class User(db.Model, UserMixin):
+class User(db.Model,DataModelMixin, UserMixin):
     """
 
     Standard User Model contains group memebership and posts.
@@ -31,14 +31,9 @@ class User(db.Model, UserMixin):
 
     #__tablename__ = "users"
 
-    id = db.Column(db.Integer, primary_key=True)
-    uuid = db.Column(db.String, default=generate_uuid, nullable=False)
-
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
     password = db.Column(db.String)
-
-
 
     tribes = relationship('Tribe', backref='owner')
     posts = relationship('Post', backref='owner')
@@ -55,7 +50,7 @@ class User(db.Model, UserMixin):
         self.password = generate_password_hash(password)
 
 
-class Tribe(db.Model):
+class Tribe(db.Model, DataModelMixin):
     """
 
     Tribe is an group of users that contains a multisig wallet
@@ -65,11 +60,8 @@ class Tribe(db.Model):
 
     #__tablename__ = "tribes"
 
-
-    id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, ForeignKey('user.id'))
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    uuid = db.Column(db.String, default=generate_uuid, nullable=False)
+
 
     #content
     name = db.Column(db.String, nullable=False)
@@ -92,7 +84,7 @@ class Tribe(db.Model):
 
 
 
-class Post(db.Model):
+class Post(db.Model, DataModelMixin):
     """
 
     Standard social media post.
@@ -102,10 +94,10 @@ class Post(db.Model):
     #__tablename__ = 'posts'
 
     id = db.Column(db.Integer, primary_key=True)
+
+
     owner_id = db.Column(db.Integer, ForeignKey('user.id'))
     tribe_id = db.Column(db.Integer, ForeignKey('tribe.id'))
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    uuid = db.Column(db.String, default=generate_uuid, nullable=False)
 
     #owner from User
 
@@ -119,7 +111,4 @@ class Post(db.Model):
                             backref=backref('parent', remote_side=[id])
                             )
 
-
-class Content(DataModel):
-    pass
 

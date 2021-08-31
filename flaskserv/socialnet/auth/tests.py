@@ -4,7 +4,7 @@ from flaskserv.socialnet import db
 from flaskserv.socialnet.models import User
 from flaskserv.socialnet.auth.views import LoginForm, RegisterForm
 
-from flaskserv.socialnet.test_base import TestBaseCase
+from flaskserv.socialnet.tests.test_base import TestBaseCase
 
 class TestRegistrationForm(TestBaseCase):
     """

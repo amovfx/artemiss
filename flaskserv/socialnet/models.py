@@ -10,12 +10,17 @@ from werkzeug.security import generate_password_hash
 if os.environ.get("TESTING"):
     generate_password_hash = lambda x : x
 
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, UniqueConstraint
+from sqlalchemy.orm import relationship, backref
 
 
 def generate_uuid():
     return uuid.uuid4().hex[:16]
+
+class DataModel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    uuid = db.Column(db.String, default=generate_uuid, nullable=False)
 
 class User(db.Model, UserMixin):
     """
@@ -27,14 +32,24 @@ class User(db.Model, UserMixin):
     #__tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String, default=generate_uuid, nullable=False)
+
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
     password = db.Column(db.String)
 
+
+
     tribes = relationship('Tribe', backref='owner')
     posts = relationship('Post', backref='owner')
 
-    def __init__(self, name, email, password):
+    UniqueConstraint('email', name='unique_constraint_1')
+
+
+    def __init__(self, name="TestUser",
+                 email="Test@Example.com",
+                 password="Bad_Password"):
+
         self.name = name
         self.email = email
         self.password = generate_password_hash(password)
@@ -60,18 +75,8 @@ class Tribe(db.Model):
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
 
+    posts = relationship('Post', backref='tribe')
 
-
-
-
-
-
-
-    # def __init__(self):
-    #     """
-    #     Ingest a flask form, set user to current_user
-    #     """
-    #     pass
 
     def preview(self):
         """
@@ -98,8 +103,23 @@ class Post(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, ForeignKey('user.id'))
+    tribe_id = db.Column(db.Integer, ForeignKey('tribe.id'))
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    uuid = db.Column(db.String, default=generate_uuid, nullable=False)
+
+    #owner from User
 
     #content
     title = db.Column(db.String, nullable=False)
     message = db.Column(db.String, nullable=False)
+
+    #parent child structure
+    parent_id = db.Column(db.Integer, ForeignKey('post.id'))
+    children = relationship("Post",
+                            backref=backref('parent', remote_side=[id])
+                            )
+
+
+class Content(DataModel):
+    pass
+

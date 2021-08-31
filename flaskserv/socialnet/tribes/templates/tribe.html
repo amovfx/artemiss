@@ -4,10 +4,14 @@
 {% endblock %}
 {% block content %}
 {{ super() }}
-<h1>{{ tribe.name }}</h1>
-<h3>{{ tribe.description }}</h3>
+<div class="row-md-8">
+    <div class="col tribe-header">
+        <h1>{{ tribe.name }}</h1>
+        <h3>{{ tribe.description }}</h3>
+    </div>
+</div>
 <div class="row">
-    <div class="col">
+    <div class="col p-2">
         <div class="col">
             This is where withdrawl requests will go.
 
@@ -22,4 +26,15 @@
         </div>
     </div>
 </div>
+{% block style %}
+{{ super() }}
+<style>
+    .tribe-header {
+        margin-top: 60px;
+        margin-bottom: 60px;
+    }
+
+
+</style>
+{% endblock %}
 {% endblock %}

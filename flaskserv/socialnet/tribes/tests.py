@@ -1,14 +1,11 @@
-import random
 import json
 
-from flaskserv.socialnet.test_base import TestBaseCase
+from flaskserv.socialnet.tests.test_base import TestBaseCase
 from flaskserv.socialnet.tribes.form import TribeForm, PostForm
 
 
 from flaskserv.socialnet.data.create_db import generate_tribes
-from flaskserv.socialnet.models import User, Tribe, Post
-
-
+from flaskserv.socialnet.models import Tribe
 
 class TestTribeForm(TestBaseCase):
     def test_tribe_form(self):

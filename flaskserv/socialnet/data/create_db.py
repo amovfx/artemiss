@@ -8,17 +8,28 @@ from flaskserv.socialnet.models import User, Tribe, Post
 import names
 import lorem
 
+
+def create_random_user():
+    """
+
+    Generates a random user for testing.
+
+    :return:
+        A user model.
+    """
+    name = names.get_first_name()
+    return User(name=name,
+                email=f"{name}@example.com",
+                password="testing_password")
+
 def generate_users(count = 10):
     """
 
-    Function to create three users in the database.
+    Function to create a number of random users in the database.
 
     """
     for i in range(count):
-        name = names.get_first_name()
-        user = User(name=name,
-                    email=f"{name}@example.com",
-                    password="bad_password")
+        user = create_random_user()
         db.session.add(user)
     db.session.commit()
 

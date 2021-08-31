@@ -1,10 +1,12 @@
 import random
 
+
 from flaskserv.socialnet.models import Tribe, User, Post
 from flaskserv.socialnet.tests.test_base import TestBaseCase
 from flaskserv.socialnet import db
 
 import lorem
+import names
 
 def get_random_item(Model):
     """
@@ -15,32 +17,66 @@ def get_random_item(Model):
     """
     return random.choice(Model.query.all())
 
-def build_reply_tree(tribe, post=None, count = 0):
-    if count > 3:
-        range_min = 2 * (3 - count)
-        range_max = 5 * (3 - count)
+def create_random_user():
+    """
+
+    Generates a random user for testing.
+
+    :return:
+        A user model.
+    """
+    name = names.get_first_name()
+    return User(name=name,
+                email=f"{name}@example.com",
+                password="testing_password")
+
+
+
+
+def generate_comment_tree(tribe,
+                          parent_post=None,
+                          depth = 3,
+                          count = 0):
+    """
+
+    Generate a comment tree
+
+    :param tribe:
+        The tribe the comments belong to.
+    :param parent_post:
+        The parent post
+    :param count:
+        parameter to keep track of depth.
+    :return:
+    """
+
+    if count < depth:
+        range_min = 2 * (2 - count)
+        range_max = 5 * (2 - count)
 
         for _ in range(random.randint(range_min, range_max)):
-
+            print("Creating ")
             rand_user = get_random_item(User)
             child_post = Post(title=lorem.sentence().split(" ")[0],
                             message=lorem.sentence(),
                             owner=rand_user,
                             tribe=tribe)
 
-            if post:
-                child_post.parent = post
+            if parent_post:
+                child_post.parent = parent_post
 
             db.session.add(child_post)
 
-            build_reply_tree(tribe,
-                             post=child_post,
-                             count=count + 1)
+            if random.uniform(0,1) < .2:
+                generate_comment_tree(tribe,
+                                      parent_post=child_post,
+                                      count=count + 1)
 
-            return
-    return
 
-class TestUserModel(TestBaseCase):
+    db.session.commit()
+    return None
+
+class TestIntegrations(TestBaseCase):
 
     def setUp(self):
         user = User()
@@ -50,7 +86,6 @@ class TestUserModel(TestBaseCase):
         tribe.owner_id = user.id
         tribe.owner = user
         db.session.add(tribe)
-        db.session.commit()
 
         post = Post(title=lorem.sentence().split("0")[0],
                     message=lorem.sentence(),
@@ -58,7 +93,7 @@ class TestUserModel(TestBaseCase):
                     tribe=tribe)
 
         db.session.add(post)
-        db.session.commit()
+
         for _ in range(5):
             child_post = Post(title=lorem.sentence().split(" ")[0],
                         message=lorem.sentence(),
@@ -69,7 +104,16 @@ class TestUserModel(TestBaseCase):
             db.session.add(child_post)
 
 
+        tribe_tree = Tribe(name="Tree Test",description="Best Tribe")
+        tribe_tree.owner_id = user.id
+        tribe_tree.owner = user
+        db.session.add(tribe_tree)
+
+        generate_comment_tree(tribe_tree)
+
         db.session.commit()
+
+
 
     def test_get_user(self):
         user = User.query.filter_by(name="TestUser").first()
@@ -84,7 +128,7 @@ class TestUserModel(TestBaseCase):
         for post in user.posts:
             print(f"title: {post.title}")
             print(f"message: {post.message}\n")
-        self.assertEqual(6, len(user.posts))
+        self.assertGreaterEqual( len(user.posts),1)
 
     def test_get_post_from_tribe(self):
         tribe = Tribe.query.filter_by(name="Test").first()
@@ -92,6 +136,10 @@ class TestUserModel(TestBaseCase):
             print(f"title: {post.title}")
             print(f"message: {post.message}\n")
         self.assertEqual(6, len(tribe.posts))
+
+    def test_post_tree(self):
+        tribe = Tribe.query.filter_by(name="Test").first()
+
 
 
 

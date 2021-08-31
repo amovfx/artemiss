@@ -1,17 +1,23 @@
+"""
 
-import os
-import uuid
+Models for storeing data for a basic social media site.
+
+"""
 
 from datetime import datetime
+import os
+import uuid
 
 from flask_login import UserMixin
 from flaskserv.socialnet import db
 from werkzeug.security import generate_password_hash
-if os.environ.get("TESTING"):
-    generate_password_hash = lambda x : x
 
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
+
+
+if os.environ.get("TESTING"):
+    generate_password_hash = lambda x : x
 
 
 def generate_uuid():

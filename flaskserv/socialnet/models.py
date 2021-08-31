@@ -15,9 +15,20 @@ from sqlalchemy.orm import relationship, backref
 
 
 def generate_uuid():
+    """
+
+    Function to generate a unique identifier for models.
+    :return:
+    """
     return uuid.uuid4().hex[:16]
 
 class DataModelMixin(object):
+    """
+
+    Mixin class that contains essential creation
+    attributes for all the models.
+
+    """
     id = db.Column(db.Integer, primary_key=True)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     uuid = db.Column(db.String, default=generate_uuid, nullable=False)
@@ -44,6 +55,17 @@ class User(db.Model,DataModelMixin, UserMixin):
     def __init__(self, name="TestUser",
                  email="Test@Example.com",
                  password="Bad_Password"):
+        """
+
+        Enabling hashing of password on the model.
+
+        :param name:
+            Name of user
+        :param email:
+            user's email
+        :param password:
+            Users plain text password.
+        """
 
         self.name = name
         self.email = email
@@ -87,7 +109,7 @@ class Tribe(db.Model, DataModelMixin):
 class Post(db.Model, DataModelMixin):
     """
 
-    Standard social media post.
+    This will be a standard social media post.
 
     """
 

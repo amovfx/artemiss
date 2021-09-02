@@ -8,6 +8,7 @@ class DefaultConfig(object):
 
 class TestConfig(DefaultConfig):
     DEBUG = True
+    SECRET_KEY = '94a02f87629b69284e7d566f18ff9esa'
     TESTING = True
     LOGIN_DISABLED = True
     WTF_CSRF_ENABLED = False

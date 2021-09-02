@@ -14,6 +14,7 @@ from werkzeug.security import generate_password_hash
 
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy.ext.declarative import declarative_base
 
 
 if os.environ.get("TESTING"):
@@ -39,7 +40,7 @@ class DataModelMixin(object):
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     uuid = db.Column(db.String, default=generate_uuid, nullable=False)
 
-class User(db.Model,DataModelMixin, UserMixin):
+class User(UserMixin,DataModelMixin,db.Model ):
     """
 
     Standard User Model contains group memebership and posts.
@@ -52,8 +53,8 @@ class User(db.Model,DataModelMixin, UserMixin):
     email = db.Column(db.String, nullable=False)
     password = db.Column(db.String)
 
-    tribes = relationship('Tribe', backref='owner')
-    posts = relationship('Post', backref='owner')
+    tribes = relationship('Tribe', backref='tribe_owner')
+    posts = relationship('Post', backref='post_owner')
 
     UniqueConstraint('email', name='unique_constraint_1')
 

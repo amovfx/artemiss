@@ -16,13 +16,11 @@ from flask_nav import Nav, register_renderer
 from .config import DevelopmentConfig
 from .nav import navbar
 
-
-
-
-
-
 login_manager = LoginManager()
+login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
+
+
 
 
 db = SQLAlchemy()
@@ -69,5 +67,5 @@ from .models import User
 
 @login_manager.user_loader
 def load_user(user_id):
-        return User.query.filter(User.id == int(user_id)).first()
+        return User.query.get(int(user_id))
 

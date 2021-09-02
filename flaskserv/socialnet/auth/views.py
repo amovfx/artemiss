@@ -61,11 +61,24 @@ def login():
 
 @auth_bp.route('/user')
 def user():
+    """
+
+    A route to get which user is logged in.
+
+    :return:
+        The current user
+    """
     return str(current_user)
 
 @auth_bp.route('/logout')
 @login_required
 def logout():
+    """
+
+    Route to logout
+    :return:
+        Returns user to landing page.
+    """
     logout_user()
     flash('You were logged out.')
     return redirect(url_for('landing.landing'))

@@ -14,7 +14,17 @@
 <div class="container">
     <div class="row" id="content">
         <div class="col" id="comments">
+
         <h1>THis is where the comments would go.</h1>
+        {% if tribe.posts %}
+            {% for post in tribe.posts %}
+
+                    <h1>{{ post.title }}</h1>
+                    <p>{{ post.message }}</p>
+
+            {% endfor %}
+        {% endif %}
+
         </div>
         <div class="col sticky-top" id="menu">
             <div class="btn-group-vertical m-5">
@@ -51,5 +61,10 @@
 
 
 </style>
+
+<script>
+    console.log("Page is loaded.")
+
+</script>
 
 {% endblock %}

@@ -2,7 +2,7 @@ import os
 
 class DefaultConfig(object):
     DEBUG = False
-    SECRET_KEY = '94a02f87629b69284e7d566f18ff9eba'
+    SECRET_KEY = '94a02f87629b69284e7d566f18ff9eda'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///data/development.db'
 
 
@@ -20,3 +20,4 @@ class DevelopmentConfig(DefaultConfig):
 class ProductionConfig(DefaultConfig):
     #from docker
     SQLALCHEMY_DATABASE_URI = 'sqlite://root:root@data/main'
+

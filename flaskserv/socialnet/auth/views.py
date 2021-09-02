@@ -10,7 +10,8 @@ from flask import (Blueprint,
 
 from flask_login import (login_user,
                          login_required,
-                         logout_user)
+                         logout_user,
+                         current_user)
 
 from werkzeug.security import check_password_hash
 
@@ -57,6 +58,10 @@ def login():
     return render_template("login.html",
                            title="Login",
                            form=form)
+
+@auth_bp.route('/user')
+def user():
+    return str(current_user)
 
 @auth_bp.route('/logout')
 @login_required

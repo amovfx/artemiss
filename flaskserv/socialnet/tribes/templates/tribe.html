@@ -29,15 +29,17 @@
             <p id="comment_data">
                 {{ post.message }}
             </p>
-            <button type="button" data-toggle="reply-form" data-target="comment_reply_form">Reply</button>
+            <button type="button" data-toggle="reply-form" data-target="form_toggle">Reply</button>
             <button type="button">Flag</button>
 
             <!-- Reply form start -->
-            <form method="POST" action="#" class="d-none reply_form" id="comment_reply_form">
-                <textarea placeholder="Reply to comment" rows="4"></textarea>
-                <button type="submit">Submit</button>
-                <button type="button" data-toggle="reply-form" data-target="comment-reply-form">Cancel</button>
-            </form>
+            <div class="hidden" id="form_toggle">
+                <form method="POST" action="#" class="reply_form" id="comment_reply_form">
+                    <textarea placeholder="Reply to comment" rows="4"></textarea>
+                    <button type="submit" data-reply="{{ post.parent }}">Submit</button>
+                    <button type="button" data-toggle="reply-form" data-target="form_toggle">Cancel</button>
+                </form>
+            </div>
             <!-- Reply form end -->
         </div>
     </details>
@@ -116,16 +118,25 @@
 <script>
     document.addEventListener(
     "click",
-    function(event) {
+    (event) => {
         var target = event.target;
         var replyForm;
         if (target.matches("[data-toggle='reply-form']")) {
             replyForm = document.getElementById(target.getAttribute("data-target"));
-            replyForm.classList.toggle("d-none");
+            replyForm.classList.toggle("hidden");
         }
     },
     false
-);
+    );
+
+    document.addEventListener(
+        "click",
+        (event) => {
+            var target = event.target;
+            if target.matches
+
+        }
+    )
 
 </script>
 

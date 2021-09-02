@@ -88,6 +88,8 @@ class TestLoginForm(TestBaseCase):
         login_form = LoginForm(name="Bob",
                                password="very_bad_password")
 
+        validation = login_form.validate()
+
         self.assertTrue(login_form.validate())
 
     def test_login_form_missing_name(self):

@@ -60,6 +60,7 @@ def login():
                            form=form)
 
 @auth_bp.route('/user')
+@login_required
 def user():
     """
 
@@ -68,7 +69,7 @@ def user():
     :return:
         The current user
     """
-    return str(current_user)
+    return str(current_user.name)
 
 @auth_bp.route('/logout')
 @login_required

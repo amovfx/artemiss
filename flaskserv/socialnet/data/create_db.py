@@ -22,6 +22,15 @@ def create_random_user():
                 email=f"{name}@example.com",
                 password="testing_password")
 
+def get_random_user():
+    """
+
+    Return a random entry of the argument model.
+    :param Model:
+    :return:
+    """
+    return random.choice(User.query.all())
+
 def generate_users(count = 10):
     """
 
@@ -32,6 +41,8 @@ def generate_users(count = 10):
         user = create_random_user()
         db.session.add(user)
     db.session.commit()
+
+
 
 def generate_tribes(count=10):
     """
@@ -44,11 +55,88 @@ def generate_tribes(count=10):
     for i in range(count):
         tribe = Tribe(name=f" {i} : {lorem.sentence().split(' ')[0]}",
                       description=lorem.sentence(),
-                      owner=random.choice(users))
+                      tribe_owner=random.choice(users))
 
         db.session.add(tribe)
 
     db.session.commit()
+
+def generate_random_post(tribe : Tribe,
+                         user):
+    """
+
+    Generate a random post.
+    :param user:
+        default calls get_random_item
+    :param tribe:
+    :return:
+    """
+    child_post = Post(title=lorem.sentence().split(" ")[0],
+                      message=lorem.paragraph(),
+                      post_owner=user,
+                      tribe=tribe)
+    return child_post
+
+
+def generate_comment_tree(tribe,
+                          parent_post=None,
+                          depth = 3,
+                          count = 0):
+    """
+
+    Generate a comment tree
+
+    :param tribe:
+        The tribe the comments belong to.
+    :param parent_post:
+        The parent post
+    :param count:
+        parameter to keep track of depth.
+    :return:
+    """
+
+    if count < depth:
+        range_min = 2 * (2 - count)
+        range_max = 5 * (2 - count)
+
+        for _ in range(random.randint(range_min, range_max)):
+            print("Creating ")
+            rand_user = get_random_user()
+            child_post = generate_random_post(rand_user, tribe)
+
+            if parent_post:
+                child_post.parent = parent_post
+
+            db.session.add(child_post)
+
+            if random.uniform(0,1) < .2:
+                generate_comment_tree(tribe,
+                                      parent_post=child_post,
+                                      count=count + 1)
+
+
+    db.session.commit()
+    return None
+
+
+
+
+
+def generate_posts_on_first_tribe(count=10):
+    """
+
+    This is a helper function to generate
+    synthetic data for the first tribe for debug purposes
+    :return:
+    """
+
+    tribes = Tribe.query.all()
+    for tribe in tribes:
+        for i in range(count):
+            post = generate_random_post(tribe, get_random_user())
+            db.session.add(post)
+    db.session.commit()
+
 
 if __name__ == '__main__': # pragma: no cover
     """
@@ -63,3 +151,4 @@ if __name__ == '__main__': # pragma: no cover
         db.create_all()
         generate_users(10)
         generate_tribes(50)
+        generate_posts_on_first_tribe(10)

@@ -42,7 +42,7 @@ div.sticky {
     <div class="container bg-light m-1">
         <div class="row">
             <div class="col p-1">
-                <a href="" style="text-decoration:none" id="org_link">
+                <a href="" style="text-decoration:none" id="tribe_link">
                     <h5 id="title"></h5>
                 </a>
                 <p id="description"></p>
@@ -60,7 +60,7 @@ div.sticky {
     var counter = 0;
 
     function loadItems() {
-        fetch(`/tribes/load?c=${counter}`).then(( response) => {
+        fetch(`/tribes/load?c=${counter}`).then((response) => {
             response.json().then((data) => {
                 if (!data.length) {
                     sentinel.innerHTML = "No More Orgs. ";
@@ -70,7 +70,7 @@ div.sticky {
                     let template_clone = template.content.cloneNode(true);
                     template_clone.querySelector("#title").innerHTML = `${data[i]["name"]}`;
                     template_clone.querySelector("#description").innerHTML = `${data[i]["description"]}`;
-                    template_clone.querySelector("#org_link").href = `/tribe/${data[i]["uuid"]}`;
+                    template_clone.querySelector("#tribe_link").href = `/tribe/${data[i]["uuid"]}`;
                     scroller.append(template_clone);
                     counter += 1;
                 }

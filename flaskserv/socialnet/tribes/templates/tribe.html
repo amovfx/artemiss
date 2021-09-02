@@ -36,6 +36,7 @@
             <div class="hidden" id="form_toggle">
                 <form method="POST" action="#" class="reply_form" id="comment_reply_form">
                     <textarea placeholder="Reply to comment" rows="4"></textarea>
+                    <input type="hidden" id="post-parent" name="post-parent-uuid" value={{ post.uuid }}></input>
                     <button type="submit" data-reply="{{ post.parent }}">Submit</button>
                     <button type="button" data-toggle="reply-form" data-target="form_toggle">Cancel</button>
                 </form>
@@ -129,14 +130,6 @@
     false
     );
 
-    document.addEventListener(
-        "click",
-        (event) => {
-            var target = event.target;
-            if target.matches
-
-        }
-    )
 
 </script>
 

@@ -78,6 +78,10 @@ class User(UserMixin,DataModelMixin,db.Model ):
         self.email = email
         self.password = generate_password_hash(password)
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
 
 class Tribe(db.Model, DataModelMixin):
     """

@@ -13,9 +13,11 @@ class TestConfig(DefaultConfig):
     LOGIN_DISABLED = True
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///data/testing.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(DefaultConfig):
     DEBUG = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class ProductionConfig(DefaultConfig):

@@ -12,10 +12,18 @@ from flask_login import UserMixin
 from flaskserv.socialnet import db
 from werkzeug.security import generate_password_hash
 
-from sqlalchemy import ForeignKey, UniqueConstraint
+from sqlalchemy import (ForeignKey,
+                        UniqueConstraint,
+                        Column,
+                        Integer,
+                        String,
+                        DateTime)
+
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm.collections import attribute_mapped_collection
 
+Base = declarative_base()
 
 if os.environ.get("TESTING"):
     generate_password_hash = lambda x : x
@@ -36,32 +44,33 @@ class DataModelMixin(object):
     attributes for all the models.
 
     """
-    id = db.Column(db.Integer, primary_key=True)
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    uuid = db.Column(db.String, default=generate_uuid, nullable=False)
+    id = Column(Integer, primary_key=True)
+    created_date = Column(DateTime, default=datetime.utcnow)
+    uuid = Column(String, default=generate_uuid, nullable=False)
 
-class User(UserMixin,DataModelMixin,db.Model ):
+class User(db.Model, DataModelMixin):
     """
 
     Standard User Model contains group memebership and posts.
 
     """
 
-    #__tablename__ = "users"
+    __tablename__ = 'user'
 
-    name = db.Column(db.String, nullable=False)
-    email = db.Column(db.String, nullable=False)
-    password = db.Column(db.String)
+    name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    password = Column(String)
 
-    tribes = relationship('Tribe', backref='tribe_owner')
-    posts = relationship('Post', backref='post_owner')
+    tribes = relationship('Tribe', backref='creator')
+    posts = relationship('Post', backref='author')
 
     UniqueConstraint('email', name='unique_constraint_1')
 
 
     def __init__(self, name="TestUser",
                  email="Test@Example.com",
-                 password="Bad_Password"):
+                 password="Bad_Password",
+                 posts=[]):
         """
 
         Enabling hashing of password on the model.
@@ -77,6 +86,7 @@ class User(UserMixin,DataModelMixin,db.Model ):
         self.name = name
         self.email = email
         self.password = generate_password_hash(password)
+        self.posts = posts
 
     def save(self):
         db.session.add(self)
@@ -93,12 +103,12 @@ class Tribe(db.Model, DataModelMixin):
 
     #__tablename__ = "tribes"
 
-    owner_id = db.Column(db.Integer, ForeignKey('user.id'))
+    owner_id = Column(Integer, ForeignKey('user.id'))
 
 
     #content
-    name = db.Column(db.String, nullable=False)
-    description = db.Column(db.String, nullable=False)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=False)
 
     posts = relationship('Post', backref='tribe')
 
@@ -116,32 +126,44 @@ class Tribe(db.Model, DataModelMixin):
                     uuid=self.uuid)
 
 
+    def save(self):
+        """
 
-class Post(db.Model, DataModelMixin):
+        Quick save function.
+        :return:
+        """
+        db.session.add(self)
+        db.session.commit()
+
+
+class Post(db.Model):
     """
 
-    This will be a standard social media post.
+    Model for a post with replys.
 
     """
+    _N = 6
 
-    #__tablename__ = 'posts'
+    id = Column(Integer, primary_key=True)
+    title = Column(String, nullable=False)
+    message = Column(String(1400))
 
-    id = db.Column(db.Integer, primary_key=True)
+    author_id = Column(Integer, ForeignKey('user.id'))
+    tribe_id = Column(Integer, ForeignKey('tribe.id'))
 
+    path = Column(String, index=True)
+    parent_id = Column(Integer, ForeignKey('post.id'))
 
-    owner_id = db.Column(db.Integer, ForeignKey('user.id'))
-    tribe_id = db.Column(db.Integer, ForeignKey('tribe.id'))
+    replies = db.relationship(
+        'Post', backref=db.backref('parent', remote_side=[id]),
+        lazy='dynamic')
 
-    #owner from User
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        prefix = self.parent.path + '.' if self.parent else ''
+        self.path = prefix + '{:0{}d}'.format(self.id, self._N)
+        db.session.commit()
 
-    #content
-    title = db.Column(db.String, nullable=False)
-    message = db.Column(db.String, nullable=False)
-
-    #parent child structure
-    parent_id = db.Column(db.Integer, ForeignKey('post.id'))
-    children = relationship("Post",
-                            backref=backref('parent', remote_side=[id])
-                            )
-
-
+    def level(self):
+        return len(self.path) // self._N - 1

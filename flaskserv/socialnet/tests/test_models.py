@@ -26,19 +26,19 @@ class TestIntegrations(TestBaseCase):
         """
 
         user = User()
-        db.session.add(user)
+        user.save()
 
         tribe = Tribe(name="Test",description="Best Tribe")
         tribe.owner_id = user.id
         tribe.tribe_owner = user
-        db.session.add(tribe)
+        tribe.save()
 
         post = generate_random_post(tribe, user)
 
         db.session.add(post)
 
         for _ in range(5):
-            child_post = generate_random_post(tribe, user)
+            child_post = generate_random_post(tribe, user=user)
             db.session.add(child_post)
 
         db.session.commit()
@@ -53,7 +53,7 @@ class TestIntegrations(TestBaseCase):
         :return:
         """
         user = User.query.filter_by(name="TestUser").first()
-        self.assertTrue((user is not None))
+        assert user is not None
 
     def test_get_tribe(self):
         """
@@ -62,7 +62,7 @@ class TestIntegrations(TestBaseCase):
         :return:
         """
         tribe = User.query.filter_by(name="Test")
-        self.assertTrue((tribe is not None))
+        assert tribe is not None
 
     def test_get_post_from_user(self):
         """
@@ -71,10 +71,7 @@ class TestIntegrations(TestBaseCase):
 
         """
         user = User.query.filter_by(name="TestUser").first()
-        for post in user.posts:
-            print(f"title: {post.title}")
-            print(f"message: {post.message}\n")
-        self.assertGreaterEqual( len(user.posts),1)
+        assert len(user.posts) >= 1
 
     def test_get_post_from_tribe(self):
         """
@@ -83,7 +80,6 @@ class TestIntegrations(TestBaseCase):
 
         """
         tribe = Tribe.query.filter_by(name="Test").first()
-        for post in tribe.posts:
-            print(f"title: {post.title}")
-            print(f"message: {post.message}\n")
-        self.assertEqual(6, len(tribe.posts))
+        self.assertEqual(6,len(tribe.posts))
+
+

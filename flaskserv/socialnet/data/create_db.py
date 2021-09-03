@@ -55,14 +55,15 @@ def generate_tribes(count=10):
     for i in range(count):
         tribe = Tribe(name=f" {i} : {lorem.sentence().split(' ')[0]}",
                       description=lorem.sentence(),
-                      tribe_owner=random.choice(users))
+                      creator=random.choice(users))
 
         db.session.add(tribe)
 
     db.session.commit()
 
 def generate_random_post(tribe : Tribe,
-                         user):
+                         user=None,
+                         parent_comment=None):
     """
 
     Generate a random post.
@@ -71,9 +72,12 @@ def generate_random_post(tribe : Tribe,
     :param tribe:
     :return:
     """
+    if tribe is None:
+        raise ValueError("Tribe must be valid")
+
     child_post = Post(title=lorem.sentence().split(" ")[0],
                       message=lorem.paragraph(),
-                      post_owner=user,
+                      author=user,
                       tribe=tribe)
     return child_post
 
@@ -118,8 +122,21 @@ def generate_comment_tree(tribe,
     db.session.commit()
     return None
 
+def generate_discreet_comment_tree(tribe) -> None:
+    """
+
+    Generates a discreet comment tree in the database.
+    :return:
+    """
 
 
+    p1 = generate_random_post(tribe, user=get_random_user())
+    p2 = generate_random_post(tribe,user=get_random_user(), parent_comment=p1)
+    p3 = generate_random_post(tribe,user=get_random_user(), parent_comment=p1)
+
+
+    for post in [p1,p2,p3]:
+        post.save()
 
 
 def generate_posts_on_first_tribe(count=10):

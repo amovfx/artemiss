@@ -4,7 +4,9 @@ from flaskserv.socialnet.tests.test_base import TestBaseCase
 from flaskserv.socialnet.tribes.form import TribeForm, PostForm
 
 
-from flaskserv.socialnet.data.create_db import generate_tribes
+from flaskserv.socialnet.data.create_db import (generate_tribes,
+                                                generate_random_post,
+                                                generate_discreet_comment_tree)
 from flaskserv.socialnet.models import Tribe
 
 class TestTribeForm(TestBaseCase):
@@ -149,6 +151,41 @@ class TestTribeRoutes(TestBaseCase):
                                     content_type='html/text')
 
         self.assertEqual(response.status_code, 200)
+
+
+class TestPost(TestBaseCase):
+    """
+
+    Testing the posting model and routes.
+
+    """
+
+    def setUp(self):
+        """
+
+        Generate a tribe an comments.
+
+        :return:
+        """
+
+        super() #generates some users.
+        generate_tribes(count=1)
+        self.tribe = Tribe.query.all()[0]
+        generate_discreet_comment_tree(self.tribe)
+
+
+    def test_get_tribe_comments(self):
+        """
+
+        Get the tribe's comments
+        :return:
+        """
+
+        self.assertEqual(3,len(self.tribe.posts))
+
+
+
+
 
 
 

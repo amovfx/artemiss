@@ -48,7 +48,7 @@ class DataModelMixin(object):
     created_date = Column(DateTime, default=datetime.utcnow)
     uuid = Column(String, default=generate_uuid, nullable=False)
 
-class User(db.Model, DataModelMixin):
+class User(db.Model, DataModelMixin, UserMixin):
     """
 
     Standard User Model contains group memebership and posts.

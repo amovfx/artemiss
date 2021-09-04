@@ -78,7 +78,8 @@ def generate_random_post(tribe : Tribe,
     child_post = Post(title=lorem.sentence().split(" ")[0],
                       message=lorem.paragraph(),
                       author=user,
-                      tribe=tribe)
+                      tribe=tribe,
+                      parent=parent_comment)
     return child_post
 
 
@@ -133,9 +134,11 @@ def generate_discreet_comment_tree(tribe) -> None:
     p1 = generate_random_post(tribe, user=get_random_user())
     p2 = generate_random_post(tribe,user=get_random_user(), parent_comment=p1)
     p3 = generate_random_post(tribe,user=get_random_user(), parent_comment=p1)
+    p4 = generate_random_post(tribe, user=get_random_user())
+    p5 = generate_random_post(tribe, user=get_random_user(), parent_comment=p4)
+    p6 = generate_random_post(tribe, user=get_random_user(), parent_comment=p5)
 
-
-    for post in [p1,p2,p3]:
+    for post in [p1,p2,p3,p4,p5,p6]:
         post.save()
 
 

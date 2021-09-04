@@ -123,7 +123,7 @@ def generate_comment_tree(tribe,
     db.session.commit()
     return None
 
-def generate_discreet_comment_tree(tribe) -> None:
+def generate_discreet_comment_tree(tribe):
     """
 
     Generates a discreet comment tree in the database.
@@ -132,14 +132,17 @@ def generate_discreet_comment_tree(tribe) -> None:
 
 
     p1 = generate_random_post(tribe, user=get_random_user())
-    p2 = generate_random_post(tribe,user=get_random_user(), parent_comment=p1)
-    p3 = generate_random_post(tribe,user=get_random_user(), parent_comment=p1)
+    p2 = generate_random_post(tribe, user=get_random_user(), parent_comment=p1)
+    p3 = generate_random_post(tribe, user=get_random_user(), parent_comment=p1)
     p4 = generate_random_post(tribe, user=get_random_user())
     p5 = generate_random_post(tribe, user=get_random_user(), parent_comment=p4)
     p6 = generate_random_post(tribe, user=get_random_user(), parent_comment=p5)
 
-    for post in [p1,p2,p3,p4,p5,p6]:
+    posts = [p1,p2,p3,p4,p5,p6]
+    for post in posts:
         post.save()
+
+    return posts
 
 
 def generate_posts_on_first_tribe(count=10):

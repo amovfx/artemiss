@@ -192,6 +192,11 @@ class TestRegistrationRoute(TestBaseCase):
         self.assertEqual(302, response.status_code)
 
     def test_register_bad_confirm(self):
+        """
+
+        Test a password miss-match
+
+        """
         post_data= self.post_data.copy()
         post_data['confirm'] = "bad_confirm"
 
@@ -284,7 +289,12 @@ class TestLoginRoute(TestBaseCase):
                          response.status_code)
 
 
-    def test_logout_page(self):
+    def test_logout_route(self):
+        """
+
+        Tesing logout route.
+
+        """
         response = self.client.get('/logout',
                                     content_type='html/text')
         self.assertEqual(302,
@@ -292,6 +302,11 @@ class TestLoginRoute(TestBaseCase):
 
 
     def test_bad_form(self):
+        """
+
+        Test empty post
+
+        """
         response = self.client.post('/login',
                                data={})
 

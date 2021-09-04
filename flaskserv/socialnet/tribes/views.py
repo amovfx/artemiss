@@ -199,26 +199,7 @@ def build_nested_comment_tree_from_tribe(tribe):
     print (json.dumps(comment_tree, indent=4))
     return comment_tree
 
-"""
-def build_nested_helper(path, text, container):
-    segs = path.split('/')
-    head = segs[0]
-    tail = segs[1:]
-    if not tail:
-        container[head] = lambda: msg(text)
-    else:
-        if head not in container:
-            container[head] = {}
-        build_nested_helper('/'.join(tail), text, container[head])
 
-def build_nested(paths):
-    container = {}
-    for path in paths:
-        build_nested_helper(path, path, container)
-    return container
-
-menu = build_nested(items)
-"""
 
 
 

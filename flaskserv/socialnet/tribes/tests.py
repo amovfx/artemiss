@@ -168,10 +168,13 @@ class TestPost(TestBaseCase):
         :return:
         """
 
-        super().setUp() #generates some users.
+        # generates some users.
+        super().setUp()
         generate_tribes(count=1)
         self.tribe = Tribe.query.all()[0]
-        generate_discreet_comment_tree(self.tribe)
+
+        #this creates three comments.
+        self.comments = generate_discreet_comment_tree(Tribe.query.all()[0])
 
 
     def test_get_tribe_comments(self):
@@ -181,7 +184,21 @@ class TestPost(TestBaseCase):
         :return:
         """
 
-        self.assertEqual(3,len(self.tribe.posts))
+        self.assertEqual(6, len(self.tribe.posts))
+
+    def test_comment_routes(self):
+        """
+
+        Testing comments
+
+        """
+
+        route = f'/tribes/comment/post/{self.tribe.uuid}'
+        response = self.client.get(route,
+                                   content_type='json')
+
+        self.assertEqual(200, response.status_code)
+
 
 
 

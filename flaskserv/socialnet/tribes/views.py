@@ -55,8 +55,9 @@ def tribes():
     return render_template("tribes.html")
 
 
-@login_required
+
 @tribes_bp.route('/tribes/new', methods=["GET", "POST"])
+@login_required
 def create_tribe():
     """
 
@@ -91,7 +92,6 @@ def create_tribe():
 
     return render_template("tribes_create.html",
                            form=form)
-
 
 
 @tribes_bp.get('/tribes/load')
@@ -142,18 +142,23 @@ def load():
     return response
 
 
-
-@tribes_bp.post('/tribes/comment/post/')
+@tribes_bp.get('/tribes/comment/post/<tribe_uuid>')
 @login_required
-def comment_reply():
+def comment_reply(tribe_uuid):
     """
 
-    Post comment to reply.
+    Get tribe comments.
 
     """
 
-    form = CommentReplyForm()
-    if form.validate_on_submit():
-        pass
+    tribe = Tribe.query.filter_by(uuid=tribe_uuid).first()
+    post_data = []
+    for post in tribe.posts:
+        path = post.path.split(".")
+
+        post_data.append(post.preview())
+
+    return jsonify(post_data), 200
+
 
 

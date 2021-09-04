@@ -189,7 +189,7 @@ class TestPost(TestBaseCase):
     def test_comment_routes(self):
         """
 
-        Testing comments
+        Testing building comment tree.
 
         """
 

@@ -4,6 +4,8 @@ View methods for the tribes database.
 
 """
 
+import json
+
 from flask import (Blueprint,
                    request,
                    redirect,
@@ -152,13 +154,71 @@ def comment_reply(tribe_uuid):
     """
 
     tribe = Tribe.query.filter_by(uuid=tribe_uuid).first()
-    post_data = []
-    for post in tribe.posts:
+    comment_tree = build_nested_comment_tree_from_tribe(tribe)
+
+
+    return jsonify(comment_tree), 200
+
+
+def build_nested_comment_tree_from_tribe(tribe):
+    """
+    Build a nested comment tree from a tribe.
+
+    :param tribe:
+        Tribe is a SQL orm
+    :return:
+        Nested dictionary
+    """
+
+
+    def build_nested(post, comment_tree, depth=0):
+        """
+
+        Get a posts path and build up a nested dictionary
+        to pass to javascript.
+
+        :param post:
+            Post SQL orm object
+        :param comment_tree:
+            dictionary to hold data
+        :param depth:
+            level of tree traversal.
+        :return:
+        """
         path = post.path.split(".")
+        head = path[depth]
+        if head not in comment_tree.keys():
+            comment_tree[head] = {'post': post.preview(),
+                                  'replies': {}}
+        else:
+            build_nested(post, comment_tree[head]['replies'], depth + 1)
 
-        post_data.append(post.preview())
+    comment_tree = dict()
+    for post in tribe.posts:
+        build_nested(post, comment_tree)
+    print (json.dumps(comment_tree, indent=4))
+    return comment_tree
 
-    return jsonify(post_data), 200
+"""
+def build_nested_helper(path, text, container):
+    segs = path.split('/')
+    head = segs[0]
+    tail = segs[1:]
+    if not tail:
+        container[head] = lambda: msg(text)
+    else:
+        if head not in container:
+            container[head] = {}
+        build_nested_helper('/'.join(tail), text, container[head])
+
+def build_nested(paths):
+    container = {}
+    for path in paths:
+        build_nested_helper(path, path, container)
+    return container
+
+menu = build_nested(items)
+"""
 
 
 

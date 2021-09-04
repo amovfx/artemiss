@@ -69,7 +69,8 @@ def user():
     :return:
         The current user
     """
-    return str(current_user.name)
+
+    return str(current_user.name) # pragma: no cover
 
 @auth_bp.route('/logout')
 @login_required

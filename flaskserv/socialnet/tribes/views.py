@@ -146,7 +146,7 @@ def load():
 
 @tribes_bp.get('/tribes/comment/post/<tribe_uuid>')
 @login_required
-def comment_reply(tribe_uuid):
+def get_comments_from_tribe(tribe_uuid):
     """
 
     Get tribe comments.

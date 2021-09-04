@@ -168,7 +168,7 @@ class TestPost(TestBaseCase):
         :return:
         """
 
-        super() #generates some users.
+        super().setUp() #generates some users.
         generate_tribes(count=1)
         self.tribe = Tribe.query.all()[0]
         generate_discreet_comment_tree(self.tribe)

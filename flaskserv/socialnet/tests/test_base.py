@@ -50,3 +50,15 @@ class TestBaseCase(TestCase):
         """
         db.session.remove()
         db.drop_all(app=self.app)
+
+
+
+class TestBase(TestBaseCase):
+    def test_app(self):
+        """
+
+        Testing app is being created.
+
+        """
+
+        assert self.client is not None

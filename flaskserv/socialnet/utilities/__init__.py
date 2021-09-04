@@ -59,7 +59,7 @@ def make_blueprint_folder(name):
     return path
 
 
-def do(name):
+def make_blueprint(name):
     bp_folder = make_blueprint_folder(name)
 
     static_folder = bp_folder / 'static'
@@ -86,4 +86,4 @@ def do(name):
         create_file(bp_folder, file_name, contents=content)
 
 
-do("my_bp")
+make_blueprint("comments")

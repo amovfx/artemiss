@@ -184,7 +184,7 @@ class TestPost(TestBaseCase):
         :return:
         """
 
-        self.assertEqual(6, len(self.tribe.posts))
+        self.assertEqual(len(self.comments), len(self.tribe.posts))
 
     def test_comment_routes(self):
         """

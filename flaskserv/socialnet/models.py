@@ -44,7 +44,7 @@ class DataModelMixin(object):
     attributes for all the models.
 
     """
-    id = Column(Integer, primary_key=True)
+
     created_date = Column(DateTime, default=datetime.utcnow)
     uuid = Column(String, default=generate_uuid, nullable=False)
 
@@ -57,6 +57,7 @@ class User(db.Model, DataModelMixin, UserMixin):
 
     __tablename__ = 'user'
 
+    id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     email = Column(String, nullable=False)
     password = Column(String)
@@ -102,7 +103,7 @@ class Tribe(db.Model, DataModelMixin):
     """
 
     #__tablename__ = "tribes"
-
+    id = Column(Integer, primary_key=True)
     owner_id = Column(Integer, ForeignKey('user.id'))
 
 
@@ -136,7 +137,7 @@ class Tribe(db.Model, DataModelMixin):
         db.session.commit()
 
 
-class Post(db.Model):
+class Post(db.Model, DataModelMixin):
     """
 
     Model for a post with replys.
@@ -167,3 +168,14 @@ class Post(db.Model):
 
     def level(self):
         return len(self.path) // self._N - 1
+
+    def preview(self):
+        """
+
+        A dict for a limited number of parameters.
+
+        """
+        return dict(title=self.title,
+                    message=self.message,
+                    uuid=self.uuid,
+                    path=self.path)

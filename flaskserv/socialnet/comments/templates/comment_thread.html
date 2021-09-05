@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../static/css/comment.css">
+</head>
+<body>
+    <p id="doc-title">This is cool.</p>
+    <div id="comment-thread">
+
+    </div>
+
+</body>
+</html>
+
+<template id="comment_template">
+    <details open class="comment" id="comment">
+        <summary>
+            <div class="comment-heading">
+                <div class="comment-voting">
+                    <button type="button">
+                        <span aria-hidden="true">&#9650;</span>
+                        <span class="sr-only">Vote up</span>
+                    </button>
+                    <button type="button">
+                        <span aria-hidden="true">&#9660;</span>
+                        <span class="sr-only">Vote down</span>
+                    </button>
+                </div>
+                <div class="comment-info">
+                    <a href="#" class="comment-author" id="comment-author">someguy14</a>
+                    <p class="m-0">
+                        #
+                        22 points &bull; 4 days ago
+                    </p>
+                </div>
+            </div>
+        </summary>
+
+        <div class="comment-body">
+            <p id="comment-data">
+                This is really great! I fully agree with what you wrote, and this is sure to help me out in the future. Thank you for posting this.
+            </p>
+            <button type="button" data-toggle="reply-form" data-target="comment-1-reply-form">Reply</button>
+            <button type="button">Flag</button>
+
+            <!-- Reply form start -->
+            <form method="POST" class="reply-form d-none" id="comment-1-reply-form">
+                <textarea placeholder="Reply to comment" rows="4"></textarea>
+                <button type="submit">Submit</button>
+                <button type="button" data-toggle="reply-form" data-target="comment-1-reply-form">Cancel</button>
+            </form>
+            <!-- Reply form end -->
+        </div>
+    </details>
+</template>
+
+<script >
+
+    function make_template(comment_data) {
+        var template = document.querySelector("#comment_template");
+        var comment_thread = document.getElementById("comment-thread")
+        let template_clone = template.content.cloneNode(true);
+        //set summary data
+        //template_clone.querySelector("#title").innerHTML = "Name";
+        template_clone.getElementById("comment-author").innerHTML = `${comment_data['title']}`;
+
+        //This will be replaced by a function to call ipfs and decode.
+        template_clone.getElementById("comment-data").innerHTML = `${comment_data['message']}`;
+
+        comment_thread.append(template_clone)
+
+    }
+
+    function load_comments() {
+        fetch("comment_data.json")
+            .then(response => response.json())
+            .then(json => {
+                for (var comment in json) {
+                    if ('replies' in json[comment])
+                        make_template(json[comment]["post"])
+                        console.log(JSON.stringify(comment['post']))
+                }
+                console.log("Working consle")
+            })
+
+    }
+    load_comments()
+
+</script>

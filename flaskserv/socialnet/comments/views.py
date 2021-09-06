@@ -13,6 +13,8 @@ from flask import (Blueprint,
 from flask_login import login_required, current_user
 from flaskserv.socialnet import db
 
+from flaskserv.socialnet.models import Post, User
+
 from flaskserv.socialnet.comments.form import CommentsForm
 
 
@@ -21,3 +23,14 @@ comments_bp = Blueprint('name',
                       template_folder='templates',
                       static_url_path='/comments/static',
                       static_folder='static')
+
+
+@comments_bp.get('/comments/<tribe>')
+def get_comments(tribe):
+    data = db.session.query(Post, User).filter(Post.author_id == User.id).filter_by(Post.tribe_id == tribe).paginate(1, 10, False)
+    print(data)
+
+
+
+
+

@@ -150,7 +150,7 @@ class Post(db.Model, DataModelMixin):
     message = Column(String(1400))
 
     author_id = Column(Integer, ForeignKey('user.id'))
-    tribe_id = Column(Integer, ForeignKey('tribe.uuid'))
+    tribe_id = Column(Integer, ForeignKey('tribe.id'))
 
     path = Column(String, index=True)
     parent_id = Column(Integer, ForeignKey('post.id'))
@@ -169,14 +169,20 @@ class Post(db.Model, DataModelMixin):
     def level(self):
         return len(self.path) // self._N - 1
 
-    def preview(self):
+    def preview(self, user):
         """
 
         A dict for a limited number of parameters.
+
+        :param user:
+            User orm to populate the author data.
+
+        :return:
+            dict of the expanded data.
 
         """
         return dict(title=self.title,
                     message=self.message,
                     uuid=self.uuid,
                     path=self.path,
-                    author=User.query.filter_by(id=self.author_id).first().name)
+                    author=user.name)

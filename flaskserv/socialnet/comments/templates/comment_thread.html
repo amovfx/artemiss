@@ -15,7 +15,7 @@
 </html>
 
 <template id="comment_template">
-    <details open class="comment" id="comment">
+    <details open class="comment" id="comment" data-path="None">
         <summary>
             <div class="comment-heading">
                 <div class="comment-voting">
@@ -42,50 +42,116 @@
             <p id="comment-data">
                 This is really great! I fully agree with what you wrote, and this is sure to help me out in the future. Thank you for posting this.
             </p>
-            <button type="button" data-toggle="reply-form" data-target="comment-1-reply-form">Reply</button>
-            <button type="button">Flag</button>
+            <button id="reply-button" type="button">Reply</button>
+            <button id="flag-button" type="button">Flag</button>
 
             <!-- Reply form start -->
-            <form method="POST" class="reply-form d-none" id="comment-1-reply-form">
-                <textarea placeholder="Reply to comment" rows="4"></textarea>
-                <button type="submit">Submit</button>
-                <button type="button" data-toggle="reply-form" data-target="comment-1-reply-form">Cancel</button>
-            </form>
+            <div >
+                <form method="POST" class="reply-form" id="reply-form" data-form_id="replace_by_js" style="display: none;">
+                    <textarea placeholder="Reply to comment" rows="4"></textarea>
+                    <button type="submit">Submit</button>
+                    <button id="reply-cancel" type="button" >Cancel</button>
+                </form>
+            </div>
             <!-- Reply form end -->
+        </div>
+        <div class="replies" id="replies" data-parent="" position="relative" >
+
         </div>
     </details>
 </template>
 
 <script >
 
-    function make_template(comment_data) {
-        var template = document.querySelector("#comment_template");
-        var comment_thread = document.getElementById("comment-thread")
-        let template_clone = template.content.cloneNode(true);
-        //set summary data
-        //template_clone.querySelector("#title").innerHTML = "Name";
-        template_clone.getElementById("comment-author").innerHTML = `${comment_data['title']}`;
+    function toggle_comment_form_display(reply_form_id) {
+        /*
 
+        Toggles the display of an element.
+
+        */
+
+        let comment_reply_form = document.querySelector(`[data-form_id="${reply_form_id}"]`);
+        if (comment_reply_form.style.display === "none") {
+
+            comment_reply_form.style.display = "block";
+        }
+        else
+        {
+            comment_reply_form.style.display = "none";
+        }
+    }
+
+    function make_template(comment_data) {
+        /*
+
+        Clone the template and set all relevant data
+
+        */
+
+        var template = document.querySelector("#comment_template");
+        var path = comment_data['path'];
+        var split_path = path.split(".");
+        var leaf = split_path[split_path.length - 1]
+        //console.log(split_path.at(-1))
+        template.setAttribute("data-path", comment_data['path']);
+
+
+        let template_clone = template.content.cloneNode(true);
+        //Set comment data
+        template_clone.getElementById("comment-author").innerHTML = `${comment_data['title']}`;
         //This will be replaced by a function to call ipfs and decode.
         template_clone.getElementById("comment-data").innerHTML = `${comment_data['message']}`;
 
+        //set up the reply buttons to toggle the shit
+        template_clone.getElementById("reply-form").setAttribute("data-form_id", `${leaf}`)
+        template_clone.getElementById("reply-button").addEventListener('click', function() {
+            toggle_comment_form_display(leaf)
+        });
+        template_clone.getElementById("reply-cancel").addEventListener('click', function() {
+            toggle_comment_form_display(leaf)
+        });
+
+
+        var comment_thread;
+        if (split_path.length > 1) {
+            //set template clone relevant data
+            reply_thread = template_clone.getElementById("replies");
+            reply_thread.setAttribute("data-parent", split_path[split_path.length - 1]);
+
+
+            comment_thread = document.querySelector(`[data-parent="${split_path[0]}"]`);
+
+
+        }
+        else
+        {
+            comment_thread = document.getElementById("comment-thread")
+            reply_thread = template_clone.getElementById("replies");
+            reply_thread.setAttribute("data-parent", split_path[0]);
+        }
         comment_thread.append(template_clone)
 
     }
 
     function load_comments() {
+        /*
+
+        Loads comments and then makes a template for each comment.
+
+         */
         fetch("comment_data.json")
             .then(response => response.json())
             .then(json => {
                 for (var comment in json) {
-                    if ('replies' in json[comment])
-                        make_template(json[comment]["post"])
-                        console.log(JSON.stringify(comment['post']))
+                    make_template(json[comment])
                 }
-                console.log("Working consle")
             })
 
     }
+
+
     load_comments()
+
+
 
 </script>

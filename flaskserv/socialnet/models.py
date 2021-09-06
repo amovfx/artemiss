@@ -150,7 +150,7 @@ class Post(db.Model, DataModelMixin):
     message = Column(String(1400))
 
     author_id = Column(Integer, ForeignKey('user.id'))
-    tribe_id = Column(Integer, ForeignKey('tribe.id'))
+    tribe_id = Column(Integer, ForeignKey('tribe.uuid'))
 
     path = Column(String, index=True)
     parent_id = Column(Integer, ForeignKey('post.id'))
@@ -178,4 +178,5 @@ class Post(db.Model, DataModelMixin):
         return dict(title=self.title,
                     message=self.message,
                     uuid=self.uuid,
-                    path=self.path)
+                    path=self.path,
+                    author=User.query.filter_by(id=self.author_id).first().name)

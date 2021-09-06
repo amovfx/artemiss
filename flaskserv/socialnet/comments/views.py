@@ -28,8 +28,30 @@ comments_bp = Blueprint('name',
 @comments_bp.get('/comments/<tribe>')
 @login_required
 def get_comments(tribe):
-    data = db.session.query(Post, User).filter(Post.author_id == User.id).filter_by(Post.tribe_id == tribe).paginate(1, 10, False)
-    print(data)
+    """
+
+    Gets the comments of a tribe.
+    This should be a generic function.
+
+    :param tribe:
+        The tribe of the comments.
+    :return:
+        json of the orms comments.
+    """
+
+
+    counter = int(request.args.get("c"))
+
+    page = db.session.query(Post, User) \
+        .filter(Post.author_id == User.id) \
+        .filter(Post.tribe_id == tribe) \
+        .paginate(counter, 10, False)
+
+
+    data = []
+    for post, user in page.items:
+        data.append(post.preview(user))
+
 
     return jsonify(data), 200
 

@@ -26,6 +26,7 @@ comments_bp = Blueprint('name',
 
 
 @comments_bp.get('/comments/<tribe>')
+@login_required
 def get_comments(tribe):
     data = db.session.query(Post, User).filter(Post.author_id == User.id).filter_by(Post.tribe_id == tribe).paginate(1, 10, False)
     print(data)

@@ -186,18 +186,6 @@ class TestPost(TestBaseCase):
 
         self.assertEqual(len(self.comments), len(self.tribe.posts))
 
-    def test_comment_routes(self):
-        """
-
-        Testing building comment tree.
-
-        """
-
-        route = f'/tribes/comment/post/{self.tribe.uuid}'
-        response = self.client.get(route,
-                                   content_type='json')
-
-        self.assertEqual(200, response.status_code)
 
 
 

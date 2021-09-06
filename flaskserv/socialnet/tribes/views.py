@@ -133,7 +133,8 @@ def load():
         counter = int(request.args.get("c"))
 
         if counter == 0:
-            response = make_response(jsonify(get_tribes(counter=0,quantity=15)), 200)
+            response = make_response(jsonify(get_tribes(counter=1,
+                                                        quantity=15)), 200)
 
         elif counter == len(Tribe.query.all()):
             response = make_response(jsonify({}), 200)

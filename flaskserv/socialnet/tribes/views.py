@@ -6,6 +6,7 @@ View methods for the tribes database.
 
 import json
 
+
 from flask import (Blueprint,
                    request,
                    redirect,
@@ -15,7 +16,6 @@ from flask import (Blueprint,
                    jsonify)
 
 from flask_login import login_required, current_user
-
 from flaskserv.socialnet import db
 
 from flaskserv.socialnet.tribes.form import TribeForm, CommentReplyForm
@@ -121,7 +121,7 @@ def load():
         """
 
         light_response_objects = []
-        tribes_slice = Tribe.query.all()[counter:counter+quantity]
+        tribes_slice = Tribe.query.paginate(counter, quantity).items
 
         for tribe in tribes_slice:
             light_response_objects.append(tribe.preview())
@@ -142,22 +142,6 @@ def load():
             response = make_response(jsonify(get_tribes(counter)), 200)
 
     return response
-
-
-@tribes_bp.get('/tribes/comment/post/<tribe_uuid>')
-@login_required
-def get_comments_from_tribe(tribe_uuid):
-    """
-
-    Get tribe comments.
-
-    """
-
-    tribe = Tribe.query.filter_by(uuid=tribe_uuid).first()
-    comment_tree = build_nested_comment_tree_from_tribe(tribe)
-
-
-    return jsonify(comment_tree), 200
 
 
 def build_nested_comment_tree_from_tribe(tribe):

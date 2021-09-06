@@ -43,6 +43,7 @@ from wtforms import StringField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Length
 
 class {name.capitalize()}Form(FlaskForm):
+    pass
    
     """
 

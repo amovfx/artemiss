@@ -26,7 +26,7 @@ from flaskserv.socialnet import db
 from flaskserv.socialnet.{name}.form import {name.capitalize()}Form
 
 
-{name}_bp = Blueprint('name',
+{name}_bp = Blueprint('{name}',
                       __name__,
                       template_folder='templates',
                       static_url_path='/{name}/static',

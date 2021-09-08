@@ -21,6 +21,8 @@ from flaskserv.socialnet import db
 from flaskserv.socialnet.tribes.form import TribeForm, CommentReplyForm
 from flaskserv.socialnet.models import Tribe, User
 
+from flaskserv.socialnet.comments.views import comments_bp
+
 
 tribes_bp = Blueprint('tribes',
                       __name__,
@@ -42,7 +44,8 @@ def tribe(uuid):
 
     tribe = Tribe.query.filter_by(uuid=uuid).first()
     return render_template("tribe.html",
-                           tribe = tribe)
+                           tribe = tribe,
+                           user = current_user)
 
 
 
@@ -54,7 +57,7 @@ def tribes():
     This is where the tribes are displayed.
 
     """
-    return render_template("tribes.html")
+    return render_template("tribes.html",)
 
 
 

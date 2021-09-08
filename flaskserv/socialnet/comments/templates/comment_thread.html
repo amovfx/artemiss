@@ -89,7 +89,7 @@
         var split_path = path.split(".");
         var leaf = split_path[split_path.length - 1]
 
-        //template_clone.setAttribute("data-path", comment_data['path']);
+        template_clone.getElementById("comment").setAttribute("data-path", comment_data['path']);
 
         //Set comment data
         template_clone.getElementById("comment-author").innerHTML = `${comment_data['title']}`;

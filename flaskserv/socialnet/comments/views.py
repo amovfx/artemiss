@@ -29,18 +29,41 @@ comments_bp = Blueprint('comments',
 @login_required
 def get_comments(tribe):
 
-    page = db.session.query(Post, User) \
-        .filter(Post.author_id == User.id) \
-        .filter(Post.tribe_id == tribe) \
-        .paginate(2, 10, False)
+    PAGE_COUNT = 15
+
+    def get_tribe_posts():
+        tribe_posts = db.session.query(Post, User).filter(Post.tribe_id == tribe)
+        return tribe_posts
+
+    def get_comment_page(tribe_posts, page, quantity):
+        page = tribe_posts.filter(Post.author_id == User.id).paginate(page, quantity, False)
+        data = []
+        for post, user in page.items:
+            data.append(post.preview(user))
+        return jsonify(data)
 
 
-    the_data = []
-    for post, user in page.items:
-        the_data.append(post.preview(user))
+    if request.args:
+        counter = int(request.args.get("c"))
 
+        tribe_posts_query = get_tribe_posts()
 
-    return jsonify(the_data), 200
+        if counter == 0:
+            response = make_response(get_comment_page(tribe_posts_query,
+                                                              page=0,
+                                                              quantity=PAGE_COUNT), 200)
+
+        elif counter == tribe_posts_query.count():
+            response = make_response(jsonify({}), 200)
+
+        else:
+            response = make_response(get_comment_page(tribe_posts_query,
+                                                              page=counter,
+                                                              quantity=PAGE_COUNT), 200)
+
+        return response
+
+    return "No argument c", 404
 
 
 

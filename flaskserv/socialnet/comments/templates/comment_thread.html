@@ -1,18 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="../static/css/comment.css">
-</head>
-<body>
-    <p id="doc-title">This is cool.</p>
-    <div id="comment-thread">
+<div id="comment-thread">
 
-    </div>
+</div>
 
-</body>
-</html>
 
 <template id="comment_template">
     <details open class="comment" id="comment" data-path="None">
@@ -66,7 +55,7 @@
     function toggle_comment_form_display(reply_form_id) {
         /*
 
-        Toggles the display of an element.
+        Toggles the display of an element. Maybe make this a little bit more generic.
 
         */
 
@@ -81,22 +70,27 @@
         }
     }
 
-    function make_template(comment_data) {
+    function clone_comment_template()
+    {
         /*
 
-        Clone the template and set all relevant data
+        Clone the comment template.
 
         */
-
         var template = document.querySelector("#comment_template");
+        template_clone = template.content.cloneNode(true);
+        return template_clone;
+
+    }
+
+    function set_comment_data(template_clone, comment_data)
+    {
         var path = comment_data['path'];
         var split_path = path.split(".");
         var leaf = split_path[split_path.length - 1]
-        //console.log(split_path.at(-1))
-        template.setAttribute("data-path", comment_data['path']);
 
+        //template_clone.setAttribute("data-path", comment_data['path']);
 
-        let template_clone = template.content.cloneNode(true);
         //Set comment data
         template_clone.getElementById("comment-author").innerHTML = `${comment_data['title']}`;
         //This will be replaced by a function to call ipfs and decode.
@@ -104,53 +98,71 @@
 
         //set up the reply buttons to toggle the shit
         template_clone.getElementById("reply-form").setAttribute("data-form_id", `${leaf}`)
+
         template_clone.getElementById("reply-button").addEventListener('click', function() {
             toggle_comment_form_display(leaf)
         });
         template_clone.getElementById("reply-cancel").addEventListener('click', function() {
             toggle_comment_form_display(leaf)
         });
+        //do I have to return this?
+        //return template_clone;
 
+    }
 
+    function get_comment_parent(template_clone, comment_data)
+    {
         var comment_thread;
-        if (split_path.length > 1) {
-            //set template clone relevant data
+        var path = comment_data['path'];
+        var split_path = path.split(".");
+        if (split_path.length > 1)
+        {
+            //the comment_data is a reply to another comment.
             reply_thread = template_clone.getElementById("replies");
             reply_thread.setAttribute("data-parent", split_path[split_path.length - 1]);
-
-
             comment_thread = document.querySelector(`[data-parent="${split_path[0]}"]`);
-
-
         }
         else
         {
+            //the comment_data is a reply to the topic.
             comment_thread = document.getElementById("comment-thread")
             reply_thread = template_clone.getElementById("replies");
             reply_thread.setAttribute("data-parent", split_path[0]);
         }
-        comment_thread.append(template_clone)
 
+        return comment_thread;
     }
 
-    function load_comments() {
+    var counter = 0;
+    function load_data(update_fn, endpoint) {
         /*
 
         Loads comments and then makes a template for each comment.
 
          */
-        fetch("comment_data.json")
+        fetch(endpoint)
             .then(response => response.json())
             .then(json => {
-                for (var comment in json) {
-                    make_template(json[comment])
+                for (const comment_data of json) {
+                    let template = clone_comment_template();
+                    set_comment_data(template,comment_data);
+                    let comment_thread = get_comment_parent(template, comment_data);
+                    comment_thread.append(template);
+                    counter++;
                 }
             })
 
     }
 
+    function load_tribe_comments(tribe)
+    {
+        load_data(set_comment_data, `/comments/${tribe}?c=${counter}`);
+    }
 
-    load_comments()
+    function verify()
+    {
+        console.log("Verified")
+    }
 
 
 

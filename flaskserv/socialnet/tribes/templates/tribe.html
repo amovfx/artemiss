@@ -11,7 +11,8 @@
 
 {% block content %}
 {{ super() }}
-{% import "import_test.html" as import_test%}
+{% import "import_test.html" as import_test %}
+{% import "comment_thread.html" as comment_thread %}
 
 
 
@@ -23,7 +24,7 @@
 </div>
 <div class="container">
     <div class="row" id="content">
-        {{ import_test }}
+        {{ comment_thread }}
         <div class="col sticky-top" id="menu">
             <div class="btn-group-vertical m-5">
                 <a href='#' class="btn btn-primary btn-lg" role="button">New Post</a>
@@ -34,9 +35,7 @@
     </div>
 </div>
 
-<template>
 
-</template>
 
 
 <style>
@@ -64,8 +63,8 @@
 <script src="{{ url_for('comments.static', filename='js/load_comments.js') }}"></script>
 <script>
     verify()
+    //load_tribe_comments("{{ tribe.id }}")
+    console.log("{{ tribe.id }}, {{ tribe.name }}")
 </script>
-
-
 
 {% endblock %}

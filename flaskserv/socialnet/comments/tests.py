@@ -1,3 +1,4 @@
+from ddt import ddt, data
 import json
 
 from flaskserv.socialnet.tests.test_base import TestBaseCase
@@ -6,7 +7,7 @@ from flaskserv.socialnet.models import Tribe
 from flaskserv.socialnet.data.create_db import (generate_tribes,
                                                 generate_random_post,
                                                 generate_discreet_comment_tree)
-
+@ddt
 class TestCommentRoutes(TestBaseCase):
 
     def setUp(self):
@@ -18,14 +19,16 @@ class TestCommentRoutes(TestBaseCase):
 
         generate_discreet_comment_tree(self.tribe)
 
-    def test_get_comment_route(self):
+
+    @data(0, 1, 5)
+    def test_get_comment_route(self, value):
         """
 
         This is a test to test the comment route
         :return:
 
         """
-        response = self.client.get(f'comments/{self.tribe.id}?c=1',
+        response = self.client.get(f'comments/{self.tribe.id}?c={value}',
                                    content_type='json')
 
         print (response.data)

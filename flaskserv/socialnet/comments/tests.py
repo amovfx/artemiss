@@ -24,8 +24,7 @@ class TestCommentRoutes(TestBaseCase):
     def test_get_comment_route(self, value):
         """
 
-        This is a test to test the comment route
-        :return:
+        This is a parameterized test for the comment route
 
         """
         response = self.client.get(f'comments/{self.tribe.id}?c={value}',
@@ -33,5 +32,16 @@ class TestCommentRoutes(TestBaseCase):
 
         print (response.data)
         self.assertEqual(200, response.status_code)
+
+    def test_get_comment_route_no_arg(self):
+        """
+
+        Test for missing argument.
+
+        """
+        response = self.client.get(f'comments/{self.tribe.id}',
+                                   content_type='html/text')
+
+        self.assertEqual(404, response.status_code)
 
 

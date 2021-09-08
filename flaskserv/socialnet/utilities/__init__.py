@@ -86,5 +86,5 @@ def make_blueprint(name):
         content = content_fn(name) if callable(content_fn) else ""
         create_file(bp_folder, file_name, contents=content)
 
-
-make_blueprint("comments")
+if __name__ == '__main__':
+    make_blueprint("comments")

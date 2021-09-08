@@ -1,55 +1,8 @@
-{% macro render_post(post) %}
-   <details open class="comment" id="comment-uuid" data_uuid="{{ post.uuid }}">
-        <a href="#comment-1" class="comment-border-link">
-            <span class="sr-only">Jump to comment-1</span>
-        </a>
-        <summary>
-            <div class="{{post.title}}">
-                <div class="comment-voting">
-                    <button type="button">
-                        <span aria-hidden="true">&#9650;</span>
-                        <span class="sr-only">Vote up</span>
-                    </button>
-                    <button type="button">
-                        <span aria-hidden="true">&#9660;</span>
-                        <span class="sr-only">Vote down</span>
-                    </button>
-                </div>
-                <div class="comment-info">
-                    <a href="#" class="comment-author">{{ post.post_owner.name }}</a>
-                    <p class="m-0">
-                        #
-                        22 points &bull; 4 days ago
-                    </p>
-                </div>
-            </div>
-        </summary>
-
-        <div class="comment-body">
-            <p id="comment_data">
-                {{ post.message }}
-            </p>
-            <button type="button" data-toggle="reply-form" data-target="form_toggle">Reply</button>
-            <button type="button">Flag</button>
-
-            <!-- Reply form start -->
-            <div class="hidden" id="form_toggle">
-                <form method="POST" action="#" class="reply_form" id="comment_reply_form">
-                    <textarea placeholder="Reply to comment" rows="4"></textarea>
-                    <input type="hidden" id="post-parent" name="post-parent-uuid" value={{ post.uuid }}></input>
-                    <button type="submit" data-reply="{{ post.parent }}">Submit</button>
-                    <button type="button" data-toggle="reply-form" data-target="form_toggle">Cancel</button>
-                </form>
-            </div>
-            <!-- Reply form end -->
-        </div>
-    </details>
-{% endmacro %}
-
 {% extends "layout.html" %}
 {% block head %}
 {{ super() }}
-<link rel= "stylesheet" type= "text/css" href="{{ url_for('tribes.static',filename='css/comment.css') }}">
+
+<link rel="stylesheet" href="{{ url_for('comments.static',filename='css/comment.css') }}">
 {% endblock %}
 
 {% block title %}
@@ -58,6 +11,7 @@
 
 {% block content %}
 {{ super() }}
+{% import "import_test.html" as import_test%}
 
 
 
@@ -69,17 +23,7 @@
 </div>
 <div class="container">
     <div class="row" id="content">
-        <div class="col" id="comment-thread">
-
-        {% if tribe.posts %}
-            {% for post in tribe.posts %}
-
-                {{ render_post(post) }}
-
-            {% endfor %}
-        {% endif %}
-
-        </div>
+        {{ import_test }}
         <div class="col sticky-top" id="menu">
             <div class="btn-group-vertical m-5">
                 <a href='#' class="btn btn-primary btn-lg" role="button">New Post</a>
@@ -116,21 +60,12 @@
 
 </style>
 
+
+<script src="{{ url_for('comments.static', filename='js/load_comments.js') }}"></script>
 <script>
-    document.addEventListener(
-    "click",
-    (event) => {
-        var target = event.target;
-        var replyForm;
-        if (target.matches("[data-toggle='reply-form']")) {
-            replyForm = document.getElementById(target.getAttribute("data-target"));
-            replyForm.classList.toggle("hidden");
-        }
-    },
-    false
-    );
-
-
+    verify()
 </script>
+
+
 
 {% endblock %}

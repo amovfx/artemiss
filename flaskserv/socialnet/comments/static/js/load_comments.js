@@ -5,11 +5,13 @@ class CommentTemplator
 {
     constructor(data, template_name)
     {
-        this.endpoint = endpoint;
+        /*
+
+
+
+         */
         this.parse_comment_data(data, template_name)
         this.clone_template(template_name)
-
-
     }
 
     clone_template(template_name)
@@ -21,9 +23,8 @@ class CommentTemplator
         */
         var template = document.querySelector(template_name);
         this.template_clone = template.content.cloneNode(true);
-
-
     }
+
     parse_comment_data(comment_data)
     {
         this.title = comment_data['title'];
@@ -116,10 +117,11 @@ class CommentTemplator
 
     }
 
+
     set_comment_thread()
     {
         /*
-
+        Probably parameterize this function.
          */
 
         if (this.is_reply)
@@ -131,10 +133,10 @@ class CommentTemplator
 
         //the comment_data is a reply to the topic.
 
-
         this.comment_thread = document.getElementById("scroller");
 
     }
+
 
     append_template()
     {
@@ -142,18 +144,28 @@ class CommentTemplator
     }
 
 
-
-
-
-    build_comment()
+    build_template()
     {
         this.set_content();
         this.set_reply_form_data();
         this.set_comment_thread();
-        this.append_template()
+        this.append_template();
+    }
+}
 
+class InfiniteLoader
+{
+    constructor(endpoint,
+                Templator)
+    {
+        this.endpoint = endpoint;
+        this.counter = 0;
+        this.templator = Templator
+    }
 
-
+    set_sentinel(sentinel_id)
+    {
+        this.sentinel = document.querySelector(sentinel_id);
     }
 
     load_data()
@@ -167,40 +179,30 @@ class CommentTemplator
             .then(response => response.json())
             .then(json => {
                 for (const comment_data of json) {
-                    this.parse_comment_data(comment_data);
-                    clone_comment_template();
-                    set_comment_data(template,comment_data);
-                    let comment_thread = get_comment_parent(template, comment_data);
-                    comment_thread.append(template);
-
+                    let Comment = new this.templator(comment_data, "#comment_template");
+                    //Comment.update(comment_data);
+                    Comment.build_template();
                 }
-                counter++;
+                this.counter++;
             })
 
     }
 
+    observe(sentinel_id)
+    {
+        let sentinel = document.querySelector(sentinel_id);
+        var intersectionObserver = new IntersectionObserver(entries =>
+            {
 
+                if (entries[0].intersectionRatio <= 0) {
+                    return;
+                }
+
+                // Call the loadItems function
+                this.load_data();
+            });
+        intersectionObserver.observe(this.sentinel);
+    }
 }
 
-function load_data(endpoint)
-    {
-    /*
-
-    Loads comments and then makes a template for each comment.
-
-     */
-        fetch(endpoint)
-            .then(response => response.json())
-            .then(json => {
-                for (const comment_data of json) {
-                    let Comment = new CommentTemplator(comment_data, "#comment_template");
-                    Comment.build_comment()
-
-
-
-                }
-                counter++;
-            })
-
-    }
 

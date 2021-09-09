@@ -67,6 +67,19 @@ def get_comments(tribe):
 
     return "No argument c", 404
 
+@comments_bp.post('/comments/reply/')
+@login_required
+def post_comment():
+    form = CommentsForm(request.form)
+    if form.validate_on_submit():
+        reply = Post()
+        reply.author = current_user
+        reply.message = form.message
+
+
+
+
+
 
 
 

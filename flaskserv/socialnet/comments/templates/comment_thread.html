@@ -44,7 +44,7 @@
                     <textarea placeholder="Reply to comment" rows="4" name="message"></textarea>
                     <input id="post" type="hidden" name="parent" value="">
                     <input id="author" type="hidden" name="author" value="">
-                    <button type="submit" onClick="post_reply()">Submit</button>
+                    <button id="form-submit" onClick="post_reply()">Submit</button>
                     <button id="reply-cancel" type="button" >Cancel</button>
                 </form>
             </div>
@@ -60,7 +60,7 @@
 
     function post_reply(form_name) {
         var replyForm = document.forms['reply']
-        console.log(replyForm)
+        console.log("Working")
     }
 
     function toggle_comment_form_display(reply_form_id) {
@@ -108,7 +108,12 @@
         template_clone.getElementById("comment-data").innerHTML = `${comment_data['message']}`;
 
         //set up the reply buttons to toggle the shit
-        template_clone.getElementById("reply-form").setAttribute("data-form_id", `${leaf}`)
+        let reply_form = template_clone.getElementById("reply-form")
+        reply_form.setAttribute("data-form_id", `${leaf}`)
+        reply_form.getElementById("form-submit").onclick = function {
+            post_reply(`${leaf}`)
+            //make template
+        }
 
         template_clone.getElementById("reply-button").addEventListener('click', function() {
             toggle_comment_form_display(leaf)
@@ -145,6 +150,14 @@
     }
 
     var counter = 0;
+
+    function build_comment(comment_data) {
+        let template = clone_comment_template();
+        set_comment_data(template,comment_data);
+        let comment_thread = get_comment_parent(template, comment_data);
+        comment_thread.append(template);
+    }
+
     function load_data(update_fn, endpoint) {
         /*
 
@@ -159,8 +172,9 @@
                     set_comment_data(template,comment_data);
                     let comment_thread = get_comment_parent(template, comment_data);
                     comment_thread.append(template);
-                    counter++;
+
                 }
+                counter++;
             })
 
     }

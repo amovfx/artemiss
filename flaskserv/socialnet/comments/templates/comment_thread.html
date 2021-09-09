@@ -110,7 +110,7 @@
         //set up the reply buttons to toggle the shit
         let reply_form = template_clone.getElementById("reply-form")
         reply_form.setAttribute("data-form_id", `${leaf}`)
-        reply_form.getElementById("form-submit").onclick = function () {
+        template_clone.getElementById("form-submit").onclick = function () {
             post_reply(`${leaf}`)
             //make template
         }

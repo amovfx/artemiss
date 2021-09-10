@@ -104,10 +104,9 @@ class CommentTemplate
             .getElementById("reply-form")
             .setAttribute("data-form_id", this.path_leaf)
 
-        //set reply form action
         this.template_clone
             .getElementById('reply-form')
-            .action = `/comments/reply?t=${this.is_reply}`;
+            .action = `/comments/reply?post_uuid=${this.uuid}`;
 
 
 
@@ -121,15 +120,15 @@ class CommentTemplate
     }
 
 
-    set_comment_thread()
+    append_to_comment_thread()
     {
         /*
         Probably parameterize this function.
          */
-
+        var comment_thread;
         if (this.is_reply)
         {
-            this.comment_thread = document.querySelector(`[data-reply_parent="${this.path_parent}"]`);
+            comment_thread = document.querySelector(`[data-reply_parent="${this.path_parent}"]`);
 
         }
         else
@@ -138,23 +137,19 @@ class CommentTemplate
 
             //the comment_data is a reply to the topic.
 
-            this.comment_thread = document.getElementById("infinite-scroller");
+            comment_thread = document.getElementById("infinite-scroller");
         }
+        comment_thread.append(this.template_clone)
+
     }
 
-
-    append_template()
-    {
-        this.comment_thread.append(this.template_clone)
-    }
 
 
     build_template()
     {
         this.set_content();
         this.set_reply_form_data();
-        this.set_comment_thread();
-        this.append_template();
+        this.append_to_comment_thread();
     }
 }
 
@@ -175,7 +170,6 @@ class InfiniteLoader
     Loads comments and then makes a template for each comment.
 
      */
-        console.log("loading data")
         fetch(`${this.endpoint}?c=${this.counter}`)
             .then(response => response.json())
             .then(json => {
@@ -204,11 +198,6 @@ class InfiniteLoader
             });
         intersectionObserver.observe(document.querySelector(sentinel_id));
     }
-}
-
-function verify_load(data)
-{
-    console.log(`Successful load: ${data}`)
 }
 
 

@@ -26,12 +26,22 @@ comments_bp = Blueprint('comments',
 
 
 @comments_bp.get('/comments/<tribe_uuid>')
-#@login_required
+@login_required
 def get_tribe_comments(tribe_uuid):
+    """
+
+    Get the posts of a tribe.
+
+    :param tribe_uuid:
+        The UUID of a tribe to disguise the tribe id.
+    :return:
+        Json of the comments.
+
+    """
     PAGE_COUNT = 15
 
     def get_tribe_posts(tribe):
-        tribe_posts = db.session.query(Post, User).filter(Post.tribe_id == tribe)
+        tribe_posts = db.session.query(Post, User).filter(Post.tribe_id == tribe.id)
         return tribe_posts
 
     def get_comment_page(tribe_posts, page, quantity):
@@ -42,7 +52,6 @@ def get_tribe_comments(tribe_uuid):
             data.append(post.preview(user))
 
         return make_response(jsonify(data), 200)
-
 
     if request.args:
         counter = int(request.args.get("c"))

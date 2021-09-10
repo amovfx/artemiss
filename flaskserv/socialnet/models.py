@@ -146,7 +146,7 @@ class Post(db.Model, DataModelMixin):
     _N = 6
 
     id = Column(Integer, primary_key=True)
-    title = Column(String, nullable=False)
+    title = Column(String)
     message = Column(String(1400))
 
     author_id = Column(Integer, ForeignKey('user.id'))

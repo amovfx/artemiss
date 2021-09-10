@@ -179,9 +179,6 @@ class InfiniteLoader
         fetch(`${this.endpoint}?c=${this.counter}`)
             .then(response => response.json())
             .then(json => {
-                console.log("fetching")
-                console.log(json);
-
                 for (const comment_data of json) {
                     let Comment = new this.templator();
                     Comment.parse_comment_data(comment_data);

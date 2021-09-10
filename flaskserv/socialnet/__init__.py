@@ -20,6 +20,8 @@ login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 
+from flask_wtf.csrf import CSRFProtect
+
 
 
 
@@ -61,9 +63,12 @@ def create_app(config_class=DevelopmentConfig):
 
     db.create_all(app=app)
 
+    csrf = CSRFProtect(app)
+    csrf.init_app(app)
+
     return app
 
-
+csrf = CSRFProtect()
 
 from .models import User
 

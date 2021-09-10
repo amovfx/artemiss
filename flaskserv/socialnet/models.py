@@ -21,7 +21,6 @@ from sqlalchemy import (ForeignKey,
 
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm.collections import attribute_mapped_collection
 
 Base = declarative_base()
 

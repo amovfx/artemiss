@@ -102,7 +102,7 @@ class CommentTemplate
         //set reply form unique identifier to grab the form
         this.template_clone
             .getElementById("reply-form")
-            .setAttribute("data-form_id", this.path_leaf)
+            .setAttribute("data-reply_form_id", this.path_leaf)
 
         this.template_clone
             .getElementById('reply-form')

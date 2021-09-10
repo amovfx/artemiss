@@ -42,7 +42,7 @@ def get_tribe_comments(tribe_uuid):
     PAGE_COUNT = 15
 
     def get_tribe_posts(tribe):
-        tribe_posts = db.session.query(Post, User).filter(Post.tribe_id == tribe.id)
+        tribe_posts = db.session.query(Post, User).order_by(Post.path).filter(Post.tribe_id == tribe.id)
         return tribe_posts
 
     def get_comment_page(tribe_posts, page, quantity):

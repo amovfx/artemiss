@@ -174,6 +174,6 @@ if __name__ == '__main__': # pragma: no cover
         db.create_all()
         generate_users(10)
         generate_tribes(50)
-        for tribe in Tribe.query.all()[:5]:
-            for _ in range(10):
+        for tribe in Tribe.query.all()[:3]:
+            for _ in range(5):
                 generate_discreet_comment_tree(tribe)

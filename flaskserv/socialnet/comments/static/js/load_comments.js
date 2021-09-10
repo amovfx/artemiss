@@ -1,16 +1,15 @@
 
 
 
-class CommentTemplator
+class CommentTemplate
 {
-    constructor(data, template_name)
+    constructor(template_name="#comment_template")
     {
         /*
 
 
 
          */
-        this.parse_comment_data(data, template_name)
         this.clone_template(template_name)
     }
 
@@ -133,7 +132,7 @@ class CommentTemplator
 
         //the comment_data is a reply to the topic.
 
-        this.comment_thread = document.getElementById("scroller");
+        this.comment_thread = document.getElementById("infinite-scroller");
 
     }
 
@@ -163,11 +162,6 @@ class InfiniteLoader
         this.templator = Templator
     }
 
-    set_sentinel(sentinel_id)
-    {
-        this.sentinel = document.querySelector(sentinel_id);
-    }
-
     load_data()
     {
     /*
@@ -175,12 +169,16 @@ class InfiniteLoader
     Loads comments and then makes a template for each comment.
 
      */
-        fetch(this.endpoint)
+        console.log("loading data")
+        fetch(`${this.endpoint}?c=${this.counter}`)
             .then(response => response.json())
             .then(json => {
+                console.log("fetching")
+                console.log(json);
+
                 for (const comment_data of json) {
-                    let Comment = new this.templator(comment_data, "#comment_template");
-                    //Comment.update(comment_data);
+                    let Comment = new this.templator();
+                    Comment.parse_comment_data(comment_data);
                     Comment.build_template();
                 }
                 this.counter++;
@@ -188,7 +186,7 @@ class InfiniteLoader
 
     }
 
-    observe(sentinel_id)
+    observe(sentinel_id = "#sentinel")
     {
         let sentinel = document.querySelector(sentinel_id);
         var intersectionObserver = new IntersectionObserver(entries =>
@@ -201,8 +199,13 @@ class InfiniteLoader
                 // Call the loadItems function
                 this.load_data();
             });
-        intersectionObserver.observe(this.sentinel);
+        intersectionObserver.observe(document.querySelector(sentinel_id));
     }
+}
+
+function verify_load(data)
+{
+    console.log(`Successful load: ${data}`)
 }
 
 

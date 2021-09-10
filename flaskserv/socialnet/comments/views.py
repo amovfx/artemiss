@@ -13,7 +13,7 @@ from flask import (Blueprint,
 from flask_login import login_required, current_user
 from flaskserv.socialnet import db
 
-from flaskserv.socialnet.models import Post, User
+from flaskserv.socialnet.models import Post, User, Tribe
 
 from flaskserv.socialnet.comments.form import CommentsForm
 
@@ -25,10 +25,9 @@ comments_bp = Blueprint('comments',
                       static_folder='static')
 
 
-@comments_bp.get('/comments/<tribe>')
-@login_required
-def get_comments(tribe):
-
+@comments_bp.get('/comments/<tribe_uuid>')
+#@login_required
+def get_tribe_comments(tribe_uuid):
     PAGE_COUNT = 15
 
     def get_tribe_posts(tribe):
@@ -47,7 +46,7 @@ def get_comments(tribe):
 
     if request.args:
         counter = int(request.args.get("c"))
-
+        tribe = Tribe.query.filter_by(uuid = tribe_uuid).first();
         tribe_posts_query = get_tribe_posts(tribe)
 
         if counter == 0:
@@ -67,9 +66,9 @@ def get_comments(tribe):
 
     return "No argument c", 404
 
-@comments_bp.post('/comments/reply/')
+@comments_bp.post('/comments/reply/<tribe>')
 @login_required
-def post_comment():
+def tribe_reply():
     form = CommentsForm(request.form)
     if form.validate_on_submit():
         reply = Post()

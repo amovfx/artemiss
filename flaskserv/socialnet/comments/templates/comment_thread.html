@@ -1,5 +1,8 @@
+
+
+
 <div id="comment-thread" class="col-md-8">
-    <div id="scroller"></div>
+    <div id="infinite-scroller"></div>
     <div class="d-flex justify-content-center mb-3" id="sentinel">
         <div class="spinner-boarder" role="status"></div>
     </div>
@@ -8,7 +11,7 @@
 
 
 <template id="comment_template">
-    <details open class="comment" id="comment" data-path="None">
+    <details open class="comment" id="comment" data-path="None" data-parent="None">
         <summary>
             <div class="comment-heading">
                 <div class="comment-voting">
@@ -22,174 +25,33 @@
                     </button>
                 </div>
                 <div class="comment-info">
-                    <a href="#" class="comment-author" id="comment-author">someguy14</a>
-                    <p class="m-0">
-                        #
-                        22 points &bull; 4 days ago
+                    <!-- Set author in js -->
+                    <a href="#" class="comment-author" id="comment-author"></a>
+                    <p class="m-0" id="comment-datetime">
                     </p>
                 </div>
             </div>
         </summary>
 
         <div class="comment-body">
-            <p id="comment-data">
-                This is really great! I fully agree with what you wrote, and this is sure to help me out in the future. Thank you for posting this.
-            </p>
+            <!-- Set message in js -->
+            <p id="comment-message"></p>
+            <!-- Set callback functions in js -->
             <button id="reply-button" type="button">Reply</button>
             <button id="flag-button" type="button">Flag</button>
 
             <!-- Reply form start -->
             <div >
-                <form name="reply-" class="reply-form" id="reply-form" data-form_id="replace_by_js" style="display: none;">
-                    <textarea placeholder="Reply to comment" rows="4" name="message"></textarea>
-                    <input id="post" type="hidden" name="parent" value="">
-                    <input id="author" type="hidden" name="author" value="">
-                    <button id="form-submit" onClick="post_reply()">Submit</button>
+                <form class="reply-form" id="reply-form" action="" data-reply_form_id="replace_by_js" style="display: none;">
+                    <textarea name="message" placeholder="Reply to comment" rows="4"></textarea>
+                    <button type="button">Submit</button>
                     <button id="reply-cancel" type="button" >Cancel</button>
                 </form>
             </div>
             <!-- Reply form end -->
         </div>
-        <div class="replies" id="replies" data-parent="" position="relative" >
+        <div class="replies" id="replies" data-reply_parent="" position="relative" >
 
         </div>
     </details>
 </template>
-
-<script >
-
-    function post_reply(form_name) {
-        var replyForm = document.forms['reply']
-        console.log("Working")
-    }
-
-    function toggle_comment_form_display(reply_form_id) {
-        /*
-
-        Toggles the display of an element. Maybe make this a little bit more generic.
-
-        */
-
-        let comment_reply_form = document.querySelector(`[data-form_id="${reply_form_id}"]`);
-        if (comment_reply_form.style.display === "none") {
-
-            comment_reply_form.style.display = "block";
-        }
-        else
-        {
-            comment_reply_form.style.display = "none";
-        }
-    }
-
-    function clone_comment_template()
-    {
-        /*
-
-        Clone the comment template.
-
-        */
-        var template = document.querySelector("#comment_template");
-        template_clone = template.content.cloneNode(true);
-        return template_clone;
-
-    }
-
-    function set_comment_data(template_clone, comment_data)
-    {
-        var path = comment_data['path'];
-        var split_path = path.split(".");
-        var leaf = split_path[split_path.length - 1]
-
-        template_clone.getElementById("comment").setAttribute("data-path", comment_data['path']);
-
-        //Set comment data
-        template_clone.getElementById("comment-author").innerHTML = `${comment_data['title']}`;
-        //This will be replaced by a function to call ipfs and decode.
-        template_clone.getElementById("comment-data").innerHTML = `${comment_data['message']}`;
-
-        //set up the reply buttons to toggle the shit
-        let reply_form = template_clone.getElementById("reply-form")
-        reply_form.setAttribute("data-form_id", `${leaf}`)
-        template_clone.getElementById("form-submit").onclick = function () {
-            post_reply(`${leaf}`)
-            //make template
-        }
-
-        template_clone.getElementById("reply-button").addEventListener('click', function() {
-            toggle_comment_form_display(leaf)
-        });
-        template_clone.getElementById("reply-cancel").addEventListener('click', function() {
-            toggle_comment_form_display(leaf)
-        });
-        //do I have to return this?
-        //return template_clone;
-
-    }
-
-    function get_comment_parent(template_clone, comment_data)
-    {
-        var comment_thread;
-        var path = comment_data['path'];
-        var split_path = path.split(".");
-        if (split_path.length > 1)
-        {
-            //the comment_data is a reply to another comment.
-            reply_thread = template_clone.getElementById("replies");
-            reply_thread.setAttribute("data-parent", split_path[split_path.length - 1]);
-            comment_thread = document.querySelector(`[data-parent="${split_path[0]}"]`);
-        }
-        else
-        {
-            //the comment_data is a reply to the topic.
-            comment_thread = document.getElementById("scroller")
-            reply_thread = template_clone.getElementById("replies");
-            reply_thread.setAttribute("data-parent", split_path[0]);
-        }
-
-        return comment_thread;
-    }
-
-    var counter = 0;
-
-    function build_comment(comment_data) {
-        let template = clone_comment_template();
-        set_comment_data(template,comment_data);
-        let comment_thread = get_comment_parent(template, comment_data);
-        comment_thread.append(template);
-    }
-
-    function load_data(update_fn, endpoint) {
-        /*
-
-        Loads comments and then makes a template for each comment.
-
-         */
-        fetch(endpoint)
-            .then(response => response.json())
-            .then(json => {
-                for (const comment_data of json) {
-                    let template = clone_comment_template();
-                    set_comment_data(template,comment_data);
-                    let comment_thread = get_comment_parent(template, comment_data);
-                    comment_thread.append(template);
-
-                }
-                counter++;
-            })
-
-    }
-
-    function load_tribe_comments(tribe)
-    {
-        load_data(set_comment_data, `/comments/${tribe}?c=${counter}`);
-    }
-
-    function verify()
-    {
-        console.log("Verified")
-    }
-
-
-
-
-</script>

@@ -61,6 +61,9 @@
 
 <script src="{{ url_for('comments.static', filename='js/load_comments.js') }}"></script>
 <script>
-    verify_load({{ tribe }})
+    verify_load("{{ tribe.uuid }}");
+    var comment_template = new CommentTemplate();
+    var infinite_loader = new InfiniteLoader("{{ url_for('comments.get_tribe_comments', tribe_uuid=tribe.uuid) }}", CommentTemplate)
+    infinite_loader.observe();
 </script>
 {% endblock %}

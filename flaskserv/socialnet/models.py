@@ -185,4 +185,5 @@ class Post(db.Model, DataModelMixin):
                     message=self.message,
                     uuid=self.uuid,
                     path=self.path,
-                    author=user.name)
+                    author=user.name,
+                    parent=self.parent_id)

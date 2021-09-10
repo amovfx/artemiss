@@ -39,8 +39,12 @@ class CommentTemplate
 
 
         if (this.is_reply) {
-            this.path_leaf = split_path[this.split_path.length - 1];
-            this.path_parent = split_path[this.split_path.length - 2];
+            this.path_leaf = split_path[(split_path.length) - 1];
+            this.path_parent = split_path[(split_path.length) - 2];
+        }
+        else
+        {
+            this.path_leaf = this.path;
         }
 
     }
@@ -125,15 +129,17 @@ class CommentTemplate
 
         if (this.is_reply)
         {
-            this.comment_thread = document.querySelector(`[data-parent="${this.path_parent}"]`);
+            this.comment_thread = document.querySelector(`[data-reply_parent="${this.path_parent}"]`);
 
         }
+        else
+        {
 
 
-        //the comment_data is a reply to the topic.
+            //the comment_data is a reply to the topic.
 
-        this.comment_thread = document.getElementById("infinite-scroller");
-
+            this.comment_thread = document.getElementById("infinite-scroller");
+        }
     }
 
 

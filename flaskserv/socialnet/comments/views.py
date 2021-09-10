@@ -8,7 +8,8 @@ from flask import (Blueprint,
                    url_for,
                    render_template,
                    make_response,
-                   jsonify)
+                   jsonify,
+                   session)
 
 from flask_login import login_required, current_user
 from flaskserv.socialnet import db
@@ -75,14 +76,40 @@ def get_tribe_comments(tribe_uuid):
 
     return "No argument c", 404
 
-@comments_bp.post('/comments/reply/<tribe>')
+@comments_bp.post('/comments/reply')
 @login_required
 def tribe_reply():
+    """
+
+    Reply from then
+    :return:
+    """
+
     form = CommentsForm(request.form)
     if form.validate_on_submit():
-        reply = Post()
-        reply.author = current_user
-        reply.message = form.message
+        tribe_id = session.get("TRIBE_ID")
+        tribe_uuid = session.get("TRIBE_UUID")
+        if (tribe_id is not None) and (tribe_uuid is not None):
+            reply = Post()
+            reply.tribe_id = tribe_id
+            reply.author = current_user
+            reply.message = form.message.data
+
+            if request.args:
+                post_uuid = request.args.get("post_uuid")
+                if post_uuid:
+                    parent_post = Post.query.filter_by(uuid=post_uuid).first()
+                    reply.parent = parent_post
+
+
+            reply.save()
+
+            return redirect(url_for('tribes.tribe',
+                                    uuid=tribe_uuid))
+
+    return "Bad Form", 404
+
+
 
 
 

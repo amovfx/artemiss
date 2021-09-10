@@ -11,7 +11,8 @@
 
 {% block content %}
 {{ super() }}
-{% import "comment_thread.html" as comment_thread %}
+{% import comment_thread.html as comment_thread %}
+
 
 
 
@@ -58,10 +59,6 @@
 
 </style>
 
-
 <script src="{{ url_for('comments.static', filename='js/load_comments.js') }}"></script>
-<script>
-    load_tribe_comments("{{ tribe.id }}")
-</script>
 
 {% endblock %}

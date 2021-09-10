@@ -16,7 +16,7 @@ class TestConfig(DefaultConfig):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class DevelopmentConfig(DefaultConfig):
-    DEBUG = True
+    DEBUG = False
     CORS_HEADERS = 'Access-Control-Allow-Origin'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

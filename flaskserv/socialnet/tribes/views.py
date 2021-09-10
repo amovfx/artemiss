@@ -43,9 +43,12 @@ def tribe(uuid):
     """
 
     tribe = Tribe.query.filter_by(uuid=uuid).first()
+    comment_thread = render_template("comment_thread.html",
+                                     tribe=tribe)
     return render_template("tribe.html",
-                           tribe = tribe,
-                           user = current_user)
+                           tribe=tribe,
+                           user=current_user,
+                           comment_thread=comment_thread)
 
 
 

@@ -61,9 +61,12 @@
 
 <script src="{{ url_for('comments.static', filename='js/load_comments.js') }}"></script>
 <script>
-    verify_load("{{ tribe.uuid }}");
-    var comment_template = new CommentTemplate();
-    var infinite_loader = new InfiniteLoader("{{ url_for('comments.get_tribe_comments', tribe_uuid=tribe.uuid) }}", CommentTemplate)
+
+    let endpoint = "{{ url_for('comments.get_tribe_comments', tribe_uuid=tribe.uuid) }}"
+    var infinite_loader = new InfiniteLoader(endpoint, CommentTemplate)
+
+    //observe default value, and element that has an id of "sentinel"
     infinite_loader.observe();
+
 </script>
 {% endblock %}

@@ -10,6 +10,7 @@ import json
 from flask import (Blueprint,
                    request,
                    redirect,
+                   session,
                    url_for,
                    render_template,
                    make_response,
@@ -43,6 +44,8 @@ def tribe(uuid):
     """
 
     tribe = Tribe.query.filter_by(uuid=uuid).first()
+    session["TRIBE_ID"] = tribe.id
+    session["TRIBE_UUID"] = tribe.uuid
     return render_template("tribe.html",
                            tribe=tribe,
                            user=current_user)

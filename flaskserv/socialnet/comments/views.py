@@ -64,7 +64,7 @@ def get_tribe_comments(tribe_uuid):
                                         page=0,
                                         quantity=PAGE_COUNT)
 
-        elif counter == tribe_posts_query.count():
+        elif counter == tribe_posts_query.count() % PAGE_COUNT:
             response = make_response(jsonify({}), 200)
 
         else:

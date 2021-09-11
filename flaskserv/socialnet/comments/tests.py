@@ -1,7 +1,7 @@
 from ddt import ddt, data
 import json
 
-from flask import session
+from flaskserv.socialnet.comments.form import CommentsForm
 
 from flaskserv.socialnet.tests.test_base import TestBaseCase
 
@@ -11,6 +11,18 @@ from flaskserv.socialnet.data.create_db import (generate_tribes,
                                                 generate_discreet_comment_tree)
 
 from unittest import mock
+
+class TestCommentForm(TestBaseCase):
+
+    def test_valid_comment_form(self):
+        comment_form = CommentsForm(message = "This is a test")
+        self.assertTrue(comment_form.validate())
+
+    def test_invalid_comment_form(self):
+        comment_form = CommentsForm()
+        self.assertFalse(comment_form.validate())
+
+
 @ddt
 class TestCommentRoutes(TestBaseCase):
 
@@ -91,6 +103,20 @@ class TestCommentRoutes(TestBaseCase):
 
         comment_reply = self.tribe.posts[-1]
         self.assertTrue(comment_reply.message == "This is a reply to the tribe")
+
+
+    def test_reply_with_badform(self):
+        """
+
+        Reply to the main route with no message.
+
+        """
+
+
+        response = self.client.post(f'comments/reply',
+                                   data={})
+
+        self.assertTrue(404, response.status_code)
 
 
 

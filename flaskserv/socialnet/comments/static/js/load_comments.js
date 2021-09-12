@@ -108,6 +108,9 @@ class CommentTemplate
             .getElementById('reply-form')
             .action = `/comments/reply?post_uuid=${this.uuid}`;
 
+        this.template_clone.getElementById("form_tag")
+            .setAttribute("value", this.uuid);
+
 
 
         //set the replies div so it can be referenced by children.

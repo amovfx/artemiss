@@ -83,46 +83,6 @@ def generate_random_post(tribe : Tribe,
     return child_post
 
 
-def generate_comment_tree(tribe,
-                          parent_post=None,
-                          depth = 3,
-                          count = 0):
-    """
-
-    Generate a comment tree
-
-    :param tribe:
-        The tribe the comments belong to.
-    :param parent_post:
-        The parent post
-    :param count:
-        parameter to keep track of depth.
-    :return:
-    """
-
-    if count < depth:
-        range_min = 2 * (2 - count)
-        range_max = 5 * (2 - count)
-
-        for _ in range(random.randint(range_min, range_max)):
-            print("Creating ")
-            rand_user = get_random_user()
-            child_post = generate_random_post(rand_user, tribe)
-
-            if parent_post:
-                child_post.parent = parent_post
-
-            db.session.add(child_post)
-
-            if random.uniform(0,1) < .2:
-                generate_comment_tree(tribe,
-                                      parent_post=child_post,
-                                      count=count + 1)
-
-
-    db.session.commit()
-    return None
-
 def generate_discreet_comment_tree(tribe):
     """
 
@@ -144,23 +104,6 @@ def generate_discreet_comment_tree(tribe):
 
     return posts
 
-
-def generate_posts_on_first_tribe(count=10):
-    """
-
-    This is a helper function to generate
-    synthetic data for the first tribe for debug purposes
-    :return:
-    """
-
-    tribes = Tribe.query.all()
-    for tribe in tribes:
-        for i in range(count):
-            post = generate_random_post(tribe, get_random_user())
-            db.session.add(post)
-    db.session.commit()
-
-
 if __name__ == '__main__': # pragma: no cover
     """
     
@@ -173,6 +116,10 @@ if __name__ == '__main__': # pragma: no cover
         db.drop_all()
         db.create_all()
         generate_users(10)
+        admin = User(name="admin",
+                     email="admin@example.com",
+                     password="admin")
+        admin.save()
         generate_tribes(50)
         for tribe in Tribe.query.all()[:3]:
             for _ in range(5):

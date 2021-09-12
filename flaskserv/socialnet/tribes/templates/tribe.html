@@ -11,7 +11,7 @@
 
 {% block content %}
 {{ super() }}
-{% import "comment_thread.html" as comment_thread %}
+
 
 <div class="row-md-8 bg-danger">
     <div class="col tribe-header">
@@ -21,7 +21,7 @@
 </div>
 <div class="container">
     <div class="row" id="content">
-        {{ comment_thread }}
+        {% include "comment_thread.html" %}
         <div class="col sticky-top" id="menu">
             <div class="btn-group-vertical m-5">
                 <a href='#' class="btn btn-primary btn-lg" role="button">New Post</a>

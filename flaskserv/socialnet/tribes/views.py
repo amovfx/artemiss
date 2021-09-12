@@ -20,6 +20,7 @@ from flask_login import login_required, current_user
 from flaskserv.socialnet import db
 
 from flaskserv.socialnet.tribes.form import TribeForm, CommentReplyForm
+from flaskserv.socialnet.comments.form import CommentsForm
 from flaskserv.socialnet.models import Tribe, User
 
 from flaskserv.socialnet.comments.views import comments_bp
@@ -31,8 +32,9 @@ tribes_bp = Blueprint('tribes',
                       static_url_path='/tribes/static',
                       static_folder='static')
 
-@login_required
+
 @tribes_bp.route('/tribe/<uuid>')
+@login_required
 def tribe(uuid):
     """
 
@@ -42,13 +44,14 @@ def tribe(uuid):
     :return:
         Rendered template.
     """
-
+    comment_form = CommentsForm()
     tribe = Tribe.query.filter_by(uuid=uuid).first()
     session["TRIBE_ID"] = tribe.id
     session["TRIBE_UUID"] = tribe.uuid
     return render_template("tribe.html",
                            tribe=tribe,
-                           user=current_user)
+                           user=current_user,
+                           form=comment_form)
 
 
 

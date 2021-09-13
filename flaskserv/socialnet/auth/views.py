@@ -32,6 +32,8 @@ def login():
     """
 
     Main login route
+    todo: add exception handling with flashed messages and proper redirects
+
     :return:
     """
     form = LoginForm(request.form)

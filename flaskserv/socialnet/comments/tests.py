@@ -111,8 +111,6 @@ class TestCommentRoutes(TestBaseCase):
         Reply to the main route with no message.
 
         """
-
-
         response = self.client.post(f'comments/reply',
                                    data={})
 

@@ -58,6 +58,7 @@ button:active {
 .comment {
     position: relative;
     margin: 20px auto;
+
 }
 .comment-heading {
     display: flex;
@@ -92,6 +93,16 @@ button:active {
     text-decoration: underline;
 }
 .replies {
+
+    padding-left:20px;
+    border-left-width: 5px;
+    border-style: dot-dash;
+    broder-color: red;
+    border-left: 2px solid rgba(0, 0, 0, 0.2)
+}
+
+.reply-form {
     margin-left: 20px;
+    margin-top:10px;
 }
 

@@ -1,7 +1,7 @@
 
 
-
-<div id="comment-thread" class="col-md-8">
+<link rel="stylesheet" href="../static/css/comment.css">{% import "bootstrap/wtf.html" as wtf %}
+<div id="comment-thread" class="col-md-6">
     <div id="infinite-scroller"></div>
     <div class="d-flex justify-content-center mb-3" id="sentinel">
         <div class="spinner-boarder" role="status"></div>
@@ -43,10 +43,12 @@
             <!-- Reply form start -->
             <div >
                 <form class="reply-form" id="reply-form" action="" data-reply_form_id="replace_by_js" method="post" style="display: none;">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <textarea name="message" placeholder="Reply to comment" rows="4"></textarea>
-                    <button type="submit">Submit</button>
-                    <button id="reply-cancel" type="button" >Cancel</button>
+                    {{ form.hidden_tag() }}
+                    {{ wtf.form_errors(form) }}
+
+                    {{ wtf.form_field(form.message) }}
+                    {{ wtf.form_field(form.submit) }}
+                    {{ wtf.form_field(form.cancel) }}
                 </form>
             </div>
             <!-- Reply form end -->

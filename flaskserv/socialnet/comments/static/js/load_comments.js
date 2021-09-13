@@ -97,8 +97,9 @@ class CommentTemplate
             .onclick = toggle_comment_form_display;
 
         this.template_clone
-            .getElementById("reply-cancel")
+            .getElementById("cancel")
             .onclick = toggle_comment_form_display;
+
         //set reply form unique identifier to grab the form
         this.template_clone
             .getElementById("reply-form")
@@ -107,11 +108,6 @@ class CommentTemplate
         this.template_clone
             .getElementById('reply-form')
             .action = `/comments/reply?post_uuid=${this.uuid}`;
-
-        this.template_clone.getElementById("form_tag")
-            .setAttribute("value", this.uuid);
-
-
 
         //set the replies div so it can be referenced by children.
         //This allows us to attach replies.

@@ -107,7 +107,8 @@ def tribe_reply():
             return redirect(url_for('tribes.tribe',
                                     uuid=tribe_uuid))
 
-    return "Bad Form", 404
+    return redirect(url_for('tribes.tribe',
+                            uuid=tribe_uuid))
 
 
 

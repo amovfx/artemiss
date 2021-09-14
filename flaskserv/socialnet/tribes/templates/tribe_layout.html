@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+<!--    the headers-->
+    <div class="header">
+        <div class="image"><h1>Banner</h1></div>
+        <div class="menu">menu of different subscribtions</div>
+    </div>
+<!--    header end-->
+<!--    content display and controls-->
+    <div class="content-layout">
+        <div class="contacts grid-item">
+            poop
+        </div>
+        <div class="coms grid-item">aww yea</div>
+        <div class="controls grid-item">
+            <div>Price Charts</div>
+            <div>Member Info</div>
+            <div>Policy INfor</div>
+            {% include "control_panel.html" %}
+
+        </div>
+    </div>
+<!--    end content-->
+</div>
+
+</body>
+</html>
+
+<style>
+
+    div {
+        border-style: solid;
+    }
+
+    .grid-layout {
+        display: grid;
+        //grid-template-columns: 300px 300px 300px;
+        grid-template-columns: 1fr 3fr 1fr;
+        grid-auto-rows: minmax(250px, auto);
+        grid-gap: 5px;
+        //justify-content: center
+
+
+    }
+    .header {
+        display:flex;
+        flex-direction: column;
+        justify-content:center;
+        align-items:center;
+        grid-gap: 10px;
+    }
+    .grid-item {
+        display: flex;
+        background-color: #21becc;
+        color:white;
+        width: auto;
+        justify-content: center;
+        align-items: start;
+
+    }
+    .banner {
+        display: flex;
+        height: 200px;
+        grid-column: 1 / -1;
+        justify-content: center;
+        align-items: center;
+    }
+    .content-layout {
+        display: grid;
+        grid-template-columns: 250px 500px 250px;
+        grid-auto-rows: minmax(20px, auto);
+        grid-gap: 5px;
+        justify-content: center;
+
+    }
+
+    .controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .center-item {
+        display: flex;
+
+        justify-content: center;
+        background-color: #0b670b;
+
+    }
+
+    .coms {
+        flex-grow: 1;
+    }
+</style>

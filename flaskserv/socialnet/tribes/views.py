@@ -65,8 +65,8 @@ def tribes():
     """
     return render_template("tribes.html")
 
-@tribes_bp.route('/tribe_layout')
-def tribes():
+@tribes_bp.get('/tribelayout')
+def tribe_layout():
     """
 
     Prototype route.

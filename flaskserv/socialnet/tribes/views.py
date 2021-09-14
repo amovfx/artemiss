@@ -63,7 +63,16 @@ def tribes():
     This is where the tribes are displayed.
 
     """
-    return render_template("tribes.html",)
+    return render_template("tribes.html")
+
+@tribes_bp.route('/tribe_layout')
+def tribes():
+    """
+
+    Prototype route.
+
+    """
+    return render_template("tribe_layout.html")
 
 
 

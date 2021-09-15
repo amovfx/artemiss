@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="header">
+    <div class="banner">
+        <h1>This is the banner</h1>
+    </div>
+    <div class="nav">This is navigation</div>
+</div>
+<div class="content">
+     <div class="ux">
+
+        <div class="info">Info</div>
+
+        <div class="feed">
+            <div class="expenses">Expenses</div>
+            <div class="chat">Chat</div>
+        </div>
+     </div>
+    <div class="controls">Controls</div>
+
+</div>
+
+<div class="add">
+    add
+</div>
+
+</body>
+</html>
+
+<style>
+    html {
+        min-height: calc(100% - 10px);
+    }
+
+    body { position:absolute; top:0; bottom:0; right:0; left:0; overflow:hidden}
+    div {
+        border-style: solid;
+        border-width: 1px;
+        border-color: rgba(0,0,0,.1);
+    }
+
+    .header {
+        display: flex;
+        flex-direction: column;
+    }
+    .nav {
+
+    }
+    .ux {
+        display:flex;
+
+    }
+    .content {
+        display: flex;
+        grid-gap: 10px;
+        flex-direction: row;
+        grid-template-columns: 2fr 5fr 2fr;
+        justify-content: center;
+        min-height: calc(100% - 120px);
+        margin:10px;
+
+
+
+    }
+    .feed {
+        width: 450px;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        flex: 1;
+
+
+
+    }
+    .info {
+        width: 250px;
+        display: flex;
+        background-color: mediumseagreen;
+        justify-content: end;
+
+    }
+    .controls {
+        display: flex;
+        justify-content: start;
+        background-color: #6e8282;
+        width: 250px;
+
+    }
+    .chat {
+        display: flex;
+        margin-top: 10px;
+        flex:1;
+
+
+    }
+
+    .add {
+        display: flex;
+        position: sticky;
+        bottom:10px;
+        left: 100%;
+        width: 100px;
+        height: 100px;
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    @media screen and (max-width: 760px){
+        .content {
+            justify-content: start;
+            flex-direction: column;
+            min-height: calc(100% - 60px);
+            padding-bottom: 30px;
+        }
+        .info {
+            width:50px;
+            min-height: 100%;
+        }
+        .ux {
+            order:1;
+            flex: 1;
+
+
+        }
+        .controls {
+            order:0;
+            min-width: 100%;
+
+        }
+
+
+    }
+
+
+
+</style>

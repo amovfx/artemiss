@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>$Title$</title>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+        <script type="text/javascript" charset="utf-8">
+            var socket;
+            $(document).ready(function(){
+                socket = io.connect('http://' + document.domain + ':' + location.port + '/chat');
+                socket.on('connect', function() {
+                    socket.emit('joined', {username: "{{ username }}",
+                    room: "{{ room }}"});
+
+
+                });
+                socket.on('status', function(data) {
+                    $('#chat').val($('#chat').val() + '<' + data.msg + '>\n');
+                    $('#chat').scrollTop($('#chat')[0].scrollHeight);
+                });
+
+                socket.on('message', function(data) {
+                    $('#chat').val($('#chat').val() + data.msg + '\n');
+                    $('#chat').scrollTop($('#chat')[0].scrollHeight);
+                });
+
+                $('#text').keypress(function(e) {
+                    var code = e.keyCode || e.which;
+                    if (code == 13) {
+                        text = $('#text').val();
+                        $('#text').val('');
+                        socket.emit('text', {msg: text});
+                    }
+                });
+            });
+            function leave_room() {
+                socket.emit('left', {}, function() {
+                    socket.disconnect();
+
+                    // go back to the login page
+                    window.location.href = "{{ url_for('main.index') }}";
+                });
+            }
+        </script>
+</head>
+
+<body>
+<div class="room">
+    <div class="display debug">Display</div>
+    <div class="input debug">
+        <form action="/chat">
+            <span><input type="text" title="Search" /></span>
+            <button type="submit">Send</button>
+
+        </form>
+    </div>
+</div>
+</body>
+</html>
+
+<style>
+    html
+    {
+        min-height: calc(100% - 380px);
+    }
+    body
+    {
+        height:100vh;
+    }
+
+    .debug
+    {
+        border-style: solid;
+        border-width: 3px;
+        border-color: #6e8282;
+    }
+
+    .room
+    {
+        display: flex;
+        flex-direction: column;
+        justify-content:center;
+        align-items: stretch;
+        align-content:center;
+        height:100%;
+    }
+
+    .display
+    {
+        height:100%;
+        display: flex;
+        align-items: end;
+        padding: 10px;
+    }
+    .input
+    {
+        display: flex;
+        height: 60px;
+        background-color: #6e8282;
+        margin-bottom: 20px;
+        align-items: center;
+        padding: 10px;
+    }
+    form {
+        display: flex;
+        width: 100%;
+        overflow: hidden;
+        background-color: yellow;
+    }
+    input {
+        width: 100%;
+    }
+    span {
+        width: 100%;
+        display: block;
+        overflow: hidden;
+        padding-right:10px;
+}
+
+</style>

@@ -48,10 +48,12 @@ def tribe(uuid):
     tribe = Tribe.query.filter_by(uuid=uuid).first()
     session["TRIBE_ID"] = tribe.id
     session["TRIBE_UUID"] = tribe.uuid
+    session["room"] = f"{tribe.id}:general"
     return render_template("tribe.html",
                            tribe=tribe,
                            user=current_user,
-                           form=comment_form)
+                           form=comment_form,
+                           room=f"{tribe.id}:general")
 
 
 
@@ -72,7 +74,9 @@ def tribe_layout():
     Prototype route.
 
     """
-    return render_template("tribe_layout.html")
+    form = CommentsForm()
+    tribe = Tribe.query.all()[0]
+    return render_template("tribe_layout.html", form=form, tribe=tribe)
 
 
 

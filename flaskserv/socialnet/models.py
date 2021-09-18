@@ -51,11 +51,13 @@ class DataModelMixin(object):
     uuid = Column(String, default=generate_uuid, nullable=False)
 
 
-subs = Table(
-    "subs",
+tribe_subsciptions = Table(
+    "tribe_subsciptions",
     db.Model.metadata,
     Column("user_id", Integer, ForeignKey("user.id")),
     Column("tribe_id", Integer, ForeignKey("tribe.id")),
+    Column("group_id", Integer, ForeignKey("group.id")),
+    Column("permssions", Integer),
 )
 
 rooms = Table(
@@ -63,6 +65,8 @@ rooms = Table(
     db.Model.metadata,
     Column("user_id", Integer, ForeignKey("user.id")),
     Column("room_id", Integer, ForeignKey("room.id")),
+    Column("groups", Integer, ForeignKey("group.id")),
+    Column("permssions", Integer),
 )
 
 
@@ -85,7 +89,13 @@ class User(db.Model, DataModelMixin, UserMixin):
     # coms
     tribe_membership = relationship(
         "Tribe",
-        secondary=subs,
+        secondary=tribe_subsciptions,
+        backref=backref("members", lazy="dynamic"),
+        lazy="dynamic",
+    )
+    room_membership = relationship(
+        "rooms",
+        secondary=rooms,
         backref=backref("members", lazy="dynamic"),
         lazy="dynamic",
     )
@@ -126,6 +136,20 @@ class User(db.Model, DataModelMixin, UserMixin):
         db.session.add(self)
         db.session.commit()
 
+    def create_tribe(self, name, description, category):
+        tribe = Tribe(name=name, description=description)
+        tribe.creator = self.id
+        tribe.save()
+
+    def create_room(self, tribe, name):
+        room = Room(name=name, tribe=tribe)
+
+    def set_permissions(self):
+        pass
+
+    def set_group(self, tribe, user):
+        pass
+
     def join_tribe(self, tribe):
         """
 
@@ -148,9 +172,8 @@ class User(db.Model, DataModelMixin, UserMixin):
             A tribe ORM.
 
         """
-        # db.session.query(subs, User, Tribe).
-        # return self.tribe_membership.filter(subs.c.tribe_id == tribe.id).count() > 0
-        return tribe.members.filter(subs.c.user_id == self.id).count() > 0
+
+        return tribe.members.filter(tribe_subsciptions.c.user_id == self.id).count() > 0
 
     def leave_tribe(self, tribe):
         """
@@ -179,7 +202,7 @@ class Tribe(db.Model, DataModelMixin):
 
     # __tablename__ = "tribes"
     id = Column(Integer, primary_key=True)
-    owner_id = Column(Integer, ForeignKey("user.id"))
+    creator = Column(Integer, ForeignKey("user.id"))
 
     # content
     name = Column(String, nullable=False)
@@ -202,7 +225,7 @@ class Tribe(db.Model, DataModelMixin):
         return dict(
             name=self.name,
             description=self.description,
-            owner_id=self.owner_id,
+            owner_id=self.creator,
             created_date=self.created_date,
             uuid=self.uuid,
         )
@@ -216,15 +239,20 @@ class Tribe(db.Model, DataModelMixin):
         db.session.add(self)
         db.session.commit()
 
+    def create_group(self):
+        pass
+
+    def create_room(self, user, name):
+        pass
+
     def __repr__(self):
         return f"<Tribe {self.id} -- {self.name}>"
 
 
 class Room(db.Model, DataModelMixin):
 
-    name = Column(String)
     id = Column(Integer, primary_key=True)
-    owner_id = Column(Integer, ForeignKey("tribe.id"))
+    name = Column(String)
 
     messages = relationship("Post", backref="room_msgs")
 
@@ -287,6 +315,6 @@ class Post(db.Model, DataModelMixin):
         )
 
 
-class Permissions(db.Model):
+class Group(db.Model):
     id = Column(Integer, primary_key=True)
-    read = Column(Boolean)
+    name = Column(String, nullable=False)

@@ -17,16 +17,17 @@ from sqlalchemy import (ForeignKey,
                         Column,
                         Integer,
                         String,
-                        DateTime)
+                        DateTime,
+                        Table,
+                        Boolean)
 
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
-
 if os.environ.get("TESTING"):
     generate_password_hash = lambda x : x
 
+Base = declarative_base()
 
 def generate_uuid():
     """
@@ -47,6 +48,20 @@ class DataModelMixin(object):
     created_date = Column(DateTime, default=datetime.utcnow)
     uuid = Column(String, default=generate_uuid, nullable=False)
 
+
+subs = Table('subs',
+             db.Model.metadata,
+             Column('user_id', Integer, ForeignKey('user.id')),
+             Column('tribe_id', Integer, ForeignKey('tribe.id')))
+
+rooms = Table('rooms',
+                db.Model.metadata,
+             Column('user_id', Integer, ForeignKey('user.id')),
+             Column('room_id', Integer, ForeignKey('room.id')))
+
+
+
+
 class User(db.Model, DataModelMixin, UserMixin):
     """
 
@@ -61,10 +76,22 @@ class User(db.Model, DataModelMixin, UserMixin):
     email = Column(String, nullable=False)
     password = Column(String)
 
-    tribes = relationship('Tribe', backref='creator')
+    tribe_creator = relationship('Tribe', backref='creator')
+
+    #coms
+    tribe_membership = relationship('Tribe',
+                          secondary=subs,
+                          backref=backref('members', lazy='dynamic'),
+                          lazy='dynamic')
+
+
     posts = relationship('Post', backref='author')
 
     UniqueConstraint('email', name='unique_constraint_1')
+
+    #wallets
+
+    #expenses
 
 
     def __init__(self, name="TestUser",
@@ -92,6 +119,51 @@ class User(db.Model, DataModelMixin, UserMixin):
         db.session.add(self)
         db.session.commit()
 
+    def join_tribe(self, tribe):
+        """
+
+        Join a tribe.
+
+        :param tribe:
+            A tribe ORM.
+
+        """
+
+        if not self.in_tribe(tribe):
+            self.tribe_membership.append(tribe)
+
+    def in_tribe(self, tribe):
+        """
+
+        Return if this user is a member of this tribe.
+
+        :param tribe:
+            A tribe ORM.
+
+        """
+        #db.session.query(subs, User, Tribe).
+        #return self.tribe_membership.filter(subs.c.tribe_id == tribe.id).count() > 0
+        return tribe.members.filter(subs.c.user_id == self.id).count() > 0
+
+    def leave_tribe(self, tribe):
+        """
+
+        Remove this user from a tribe.
+
+        :param tribe:
+            A tribe ORM.
+
+        """
+
+        if self.in_tribe(tribe):
+            self.tribe_membership.remove(tribe)
+
+    def __repr__(self):
+        return f'<User {self.id} {self.name} -- {self.email} >'
+
+
+
+
 
 class Tribe(db.Model, DataModelMixin):
     """
@@ -110,8 +182,13 @@ class Tribe(db.Model, DataModelMixin):
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
 
+    #Expenses
     posts = relationship('Post', backref='tribe')
 
+    #Chat
+    channels = relationship('Room', backref='channel')
+
+    #Wallet
 
     def preview(self):
         """
@@ -135,6 +212,19 @@ class Tribe(db.Model, DataModelMixin):
         db.session.add(self)
         db.session.commit()
 
+    def __repr__(self):
+        return f"<Tribe {self.id} -- {self.name}>"
+
+class Room(db.Model, DataModelMixin):
+
+    name = Column(String)
+    id = Column(Integer, primary_key=True)
+    owner_id = Column(Integer, ForeignKey('tribe.id'))
+
+
+    messages = relationship('Post', backref='room_msgs')
+
+
 
 class Post(db.Model, DataModelMixin):
     """
@@ -150,6 +240,10 @@ class Post(db.Model, DataModelMixin):
 
     author_id = Column(Integer, ForeignKey('user.id'))
     tribe_id = Column(Integer, ForeignKey('tribe.id'))
+
+    #chat
+    room_id = Column(Integer, ForeignKey('room.id'))
+
 
     path = Column(String, index=True)
     parent_id = Column(Integer, ForeignKey('post.id'))
@@ -186,3 +280,8 @@ class Post(db.Model, DataModelMixin):
                     path=self.path,
                     author=user.name,
                     parent=self.parent_id)
+
+
+class Permissions(db.Model):
+    id = Column(Integer, primary_key=True)
+    read = Column(Boolean)

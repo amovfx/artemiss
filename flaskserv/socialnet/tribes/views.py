@@ -46,9 +46,11 @@ def tribe(uuid):
     """
     comment_form = CommentsForm()
     tribe = Tribe.query.filter_by(uuid=uuid).first()
+
     session["TRIBE_ID"] = tribe.id
     session["TRIBE_UUID"] = tribe.uuid
     session["room"] = f"{tribe.id}:general"
+
     return render_template("tribe.html",
                            tribe=tribe,
                            user=current_user,
@@ -94,9 +96,7 @@ def create_tribe():
     if request.method == 'POST':
         if form.validate_on_submit():
 
-            tribe = Tribe()
-            tribe.name = request.form["name"]
-            tribe.description = request.form["description"]
+
 
             #an unfortunate method for testing the creation of tribes
             if current_user.is_anonymous:
@@ -107,7 +107,10 @@ def create_tribe():
             else: # pragma: no cover
                 user = current_user
 
-            tribe.owner = user
+            tribe = Tribe(name = request.form["name"],
+                          description=request.form["description"],
+                          creator= user)
+
             db.session.add(tribe)
             db.session.commit()
 

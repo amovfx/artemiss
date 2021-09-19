@@ -86,6 +86,7 @@ def tribe_reply():
     """
 
     form = CommentsForm(request.form)
+    tribe_uuid = ""
     if form.validate_on_submit():
         tribe_id = session.get("TRIBE_ID")
         tribe_uuid = session.get("TRIBE_UUID")

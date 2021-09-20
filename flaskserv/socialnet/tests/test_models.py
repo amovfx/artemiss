@@ -157,7 +157,7 @@ def annotate_enum(enum_class):
         yield enum_val
 
 
-edata = lambda x: idata(annotate_enum(x))
+edata = lambda enum_class: idata(annotate_enum(enum_class))
 
 
 @ddt

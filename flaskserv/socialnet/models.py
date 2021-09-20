@@ -49,6 +49,15 @@ class PERMISSIONS(Enum):
     WRITE = 3
     EXECUTE = 4
 
+    @classmethod
+    def unittest_generator(cls):
+        for enum_val in cls.__iter__():
+            setattr(
+                enum_val, "__doc__", f"{enum_val.__class__.__name__}.{enum_val.name}"
+            )
+            yield enum_val
+
+
 class DataModelMixin(object):
     """
 
@@ -75,11 +84,6 @@ class DataModelMixin(object):
     @classmethod
     def foreign_key_column(cls):
         return Column(f"{cls.get_name()}_id", Integer, cls.foreign_key())
-
-
-
-
-
 
 
 TribeMembers = Table(
@@ -266,7 +270,6 @@ class Tribe(db.Model, DataModelMixin):
         # self.create_room()
 
     def requires_permission(self, func, value):
-
         @functools.wraps(func)
         def wrapper_decorator(*args, **kwargs):
             if value == current_user.get_permissions():
@@ -298,7 +301,6 @@ class Tribe(db.Model, DataModelMixin):
         """
         db.session.add(self)
         db.session.commit()
-
 
     def create_group(self, name):
         """
@@ -385,8 +387,6 @@ class Post(db.Model, DataModelMixin):
 
 # class UserTribeData(db.Model):
 #     groups = relationship("Post", backref="room_msgs")
-
-
 
 
 class UserGroup(db.Model, DataModelMixin):

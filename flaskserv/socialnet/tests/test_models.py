@@ -142,24 +142,6 @@ class TestUserTribes(TestBaseCase):
         self.assertEqual(value + 1, self.user.tribe_membership.count())
 
 
-def annotate_enum(enum_class):
-    """
-
-    method to annotate enum classes for ddt data
-
-    :param enum_class:
-        A user defined enum class
-    :return:
-        yield modified enum member
-    """
-    for enum_val in enum_class:
-        setattr(enum_val, "__doc__", f"{enum_val.__class__.__name__}.{enum_val.name}")
-        yield enum_val
-
-
-enum_data = lambda enum_class: idata(annotate_enum(enum_class))
-
-
 @ddt
 class TestUserMethods(TestBaseCase):
     def setUp(self):
@@ -178,7 +160,7 @@ class TestUserMethods(TestBaseCase):
         tribe = Tribe.query.all()
         assert tribe is not None
 
-    @enum_data(PERMISSIONS)
+    @idata(PERMISSIONS.unittest_generator())
     def test_permissions(self, value):
         tribe = Tribe.query.all()[0]
         self.user.set_permissions(tribe, value)

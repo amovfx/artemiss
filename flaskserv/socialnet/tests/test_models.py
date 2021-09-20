@@ -157,7 +157,7 @@ def annotate_enum(enum_class):
         yield enum_val
 
 
-edata = lambda enum_class: idata(annotate_enum(enum_class))
+enum_data = lambda enum_class: idata(annotate_enum(enum_class))
 
 
 @ddt
@@ -178,7 +178,7 @@ class TestUserMethods(TestBaseCase):
         tribe = Tribe.query.all()
         assert tribe is not None
 
-    @edata(PERMISSIONS)
+    @enum_data(PERMISSIONS)
     def test_permissions(self, value):
         tribe = Tribe.query.all()[0]
         self.user.set_permissions(tribe, value)

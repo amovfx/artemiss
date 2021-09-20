@@ -4,9 +4,9 @@ Testing model integrations.
 
 """
 
-from ddt import ddt, data
+from ddt import ddt, data, unpack, idata, DATA_ATTR
 
-from flaskserv.socialnet.models import Tribe, User, TribeMembers
+from flaskserv.socialnet.models import Tribe, User, TribeMembers, PERMISSIONS
 from flaskserv.socialnet.tests.test_base import TestBaseCase
 from flaskserv.socialnet.data.create_db import (
     generate_random_post,
@@ -142,6 +142,25 @@ class TestUserTribes(TestBaseCase):
         self.assertEqual(value + 1, self.user.tribe_membership.count())
 
 
+def annotate_enum(enum_class):
+    """
+
+    method to annotate enum classes for ddt data
+
+    :param enum_class:
+        A user defined enum class
+    :return:
+        yield modified enum member
+    """
+    for enum_val in enum_class:
+        setattr(enum_val, "__doc__", f"{enum_val.__class__.__name__}.{enum_val.name}")
+        yield enum_val
+
+
+edata = lambda x: idata(annotate_enum(x))
+
+
+@ddt
 class TestUserMethods(TestBaseCase):
     def setUp(self):
         u = User()
@@ -159,8 +178,9 @@ class TestUserMethods(TestBaseCase):
         tribe = Tribe.query.all()
         assert tribe is not None
 
-    def test_permissions(self):
+    @edata(PERMISSIONS)
+    def test_permissions(self, value):
         tribe = Tribe.query.all()[0]
-        self.user.set_permissions(tribe, 777)
+        self.user.set_permissions(tribe, value)
         permissions = self.user.get_permissions(tribe)
-        self.assertEqual(777, permissions)
+        self.assertEqual(value, permissions)

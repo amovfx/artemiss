@@ -50,7 +50,7 @@ class PERMISSIONS(Enum):
     EXECUTE = 4
 
     @classmethod
-    def unittest_generator(cls):
+    def unittest_idata_generator(cls):
         for enum_val in cls.__iter__():
             setattr(
                 enum_val, "__doc__", f"{enum_val.__class__.__name__}.{enum_val.name}"

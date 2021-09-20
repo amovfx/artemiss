@@ -160,7 +160,7 @@ class TestUserMethods(TestBaseCase):
         tribe = Tribe.query.all()
         assert tribe is not None
 
-    @idata(PERMISSIONS.unittest_generator())
+    @idata(PERMISSIONS.unittest_idata_generator())
     def test_permissions(self, value):
         tribe = Tribe.query.all()[0]
         self.user.set_permissions(tribe, value)

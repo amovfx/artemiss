@@ -86,13 +86,18 @@ class DataModelMixin(object):
 
 
 class PermissionsGroup(db.Model, DataModelMixin):
-    # many to many relationship
+    """
+
+    Many to Many relationship table that contains permissions data.
+
+    """
+    # many to many relationships
     user_id = Column(ForeignKey("user.id"), primary_key=True)
     tribe_id = Column(ForeignKey("tribe.id"), primary_key=True)
     user = relationship("User", back_populates="tribes")
     tribe = relationship("Tribe", back_populates="users")
 
-    # extra data to describe the relationship
+    # extra data to describe the relationship, permissions restrict access.
     name = Column(String, nullable=False)
     permissions = Column(
         SQLEnum(PERMISSIONS), default=PERMISSIONS.EXECUTE, nullable=False
@@ -103,6 +108,25 @@ class PermissionsGroup(db.Model, DataModelMixin):
         self.user = user
         self.tribe = tribe
         self.permissions = permissions
+        self.save()
+
+    @classmethod
+    def get_user_tribe_permissions(cls, user, tribe):
+        """
+
+        Get the permissions of the user in the tribe
+        :param user:
+            sql orm
+        :param tribe:
+            sql orm
+        :return: Enum(PERMISSION)
+
+        """
+        user_permissions = (db.session
+                            .query(PermissionsGroup)
+                            .filter(and_(PermissionsGroup.user_id == user.id, PermissionsGroup.tribe_id == tribe.id))
+                            .first())
+        return user_permissions.permissions
 
 
 class User(db.Model, DataModelMixin, UserMixin):
@@ -150,7 +174,7 @@ class User(db.Model, DataModelMixin, UserMixin):
         self.password = generate_password_hash(password)
         self.posts = posts
 
-    def join_tribe(self, tribe):
+    def join_tribe(self, tribe, permissions=PERMISSIONS.READ):
         """
 
         Join a tribe.
@@ -161,16 +185,15 @@ class User(db.Model, DataModelMixin, UserMixin):
         """
 
         if not self.in_tribe(tribe):
-            permissions_group = PermissionsGroup(
-                name="applicant", user=self, tribe=tribe, permissions=PERMISSIONS.READ
+            PermissionsGroup(
+                name="applicant", user=self, tribe=tribe, permissions=permissions
             )
-            permissions_group.save()
 
     def in_tribe(self, tribe):
         """
 
                 Return if this user is a member of this tribe.
-        x
+
                 :param tribe:
                     A tribe ORM.
 
@@ -190,6 +213,10 @@ class User(db.Model, DataModelMixin, UserMixin):
 
         if self.in_tribe(tribe):
             self.tribes.remove(tribe)
+
+    def get_tribe_permissions(self, tribe):
+        return PermissionsGroup.get_user_tribe_permissions(self, tribe)
+
 
     def __repr__(self):
         return f"<User {self.id} {self.name} -- {self.email} >"
@@ -269,6 +296,12 @@ class Tribe(db.Model, DataModelMixin):
             name=name, user=user, tribe=self, permissions=permissions
         )
         permissions_group.save()
+
+    def get_user_permissions(self, user):
+        return PermissionsGroup.get_user_tribe_permissions(user, self)
+
+    def update_user_permissions(self, user):
+        pass
 
     def create_room(self, user, name):
         pass

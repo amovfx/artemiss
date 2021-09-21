@@ -9,7 +9,7 @@ import names
 import lorem
 
 
-def create_random_user():
+def generate_random_user():
     """
 
     Generates a random user for testing.
@@ -18,9 +18,8 @@ def create_random_user():
         A user model.
     """
     name = names.get_first_name()
-    return User(name=name,
-                email=f"{name}@example.com",
-                password="testing_password")
+    return User(name=name, email=f"{name}@example.com", password="testing_password")
+
 
 def get_random_user():
     """
@@ -31,17 +30,26 @@ def get_random_user():
     """
     return random.choice(User.query.all())
 
-def generate_users(count = 10):
+
+def generate_users(count=10):
     """
 
     Function to create a number of random users in the database.
 
     """
     for i in range(count):
-        user = create_random_user()
+        user = generate_random_user()
         db.session.add(user)
     db.session.commit()
 
+
+def generate_random_tribe(save=True):
+    return Tribe(
+        name=f"{lorem.sentence().split(' ')[0]}",
+        description=lorem.sentence(),
+        creator=generate_random_user(),
+        save=save,
+    )
 
 
 def generate_tribes(count=10):
@@ -53,17 +61,14 @@ def generate_tribes(count=10):
     users = User.query.all()
 
     for i in range(count):
-        tribe = Tribe(name=f" {i} : {lorem.sentence().split(' ')[0]}",
-                      description=lorem.sentence(),
-                      creator=random.choice(users))
+        tribe = generate_random_tribe(save=False)
 
         db.session.add(tribe)
 
     db.session.commit()
 
-def generate_random_post(tribe : Tribe,
-                         user=None,
-                         parent_comment=None):
+
+def generate_random_post(tribe: Tribe, user=None, parent_comment=None):
     """
 
     Generate a random post.
@@ -75,11 +80,13 @@ def generate_random_post(tribe : Tribe,
     if tribe is None:
         raise ValueError("Tribe must be valid")
 
-    child_post = Post(title=lorem.sentence().split(" ")[0],
-                      message=lorem.paragraph(),
-                      author=user,
-                      tribe=tribe,
-                      parent=parent_comment)
+    child_post = Post(
+        title=lorem.sentence().split(" ")[0],
+        message=lorem.paragraph(),
+        author=user,
+        tribe=tribe,
+        parent=parent_comment,
+    )
     return child_post
 
 
@@ -90,7 +97,6 @@ def generate_discreet_comment_tree(tribe):
     :return:
     """
 
-
     p1 = generate_random_post(tribe, user=get_random_user())
     p2 = generate_random_post(tribe, user=get_random_user(), parent_comment=p1)
     p3 = generate_random_post(tribe, user=get_random_user(), parent_comment=p1)
@@ -98,17 +104,18 @@ def generate_discreet_comment_tree(tribe):
     p5 = generate_random_post(tribe, user=get_random_user(), parent_comment=p4)
     p6 = generate_random_post(tribe, user=get_random_user(), parent_comment=p5)
 
-    posts = [p1,p2,p3,p4,p5,p6]
+    posts = [p1, p2, p3, p4, p5, p6]
     for post in posts:
         post.save()
 
     return posts
 
-if __name__ == '__main__': # pragma: no cover
+
+if __name__ == "__main__":  # pragma: no cover
     """
-    
+
     This is for development only
-    
+
     """
     app = create_app()
 
@@ -116,9 +123,7 @@ if __name__ == '__main__': # pragma: no cover
         db.drop_all()
         db.create_all()
         generate_users(10)
-        admin = User(name="admin",
-                     email="admin@example.com",
-                     password="admin")
+        admin = User(name="admin", email="admin@example.com", password="admin")
         admin.save()
         generate_tribes(50)
         for tribe in Tribe.query.all()[:3]:

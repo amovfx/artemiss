@@ -6,7 +6,6 @@ Models for storeing data for a basic social media site.
 
 from datetime import datetime
 from enum import Enum, unique
-import functools
 import os
 import uuid
 
@@ -22,12 +21,12 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    Table,
     Boolean,
+    and_,
+    Table,
 )
 
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.ext.declarative import declarative_base
 
 if os.environ.get("TESTING"):
     generate_password_hash = lambda x: x
@@ -86,21 +85,24 @@ class DataModelMixin(object):
         return Column(f"{cls.get_name()}_id", Integer, cls.foreign_key())
 
 
-TribeMembers = Table(
-    "tribe_members",
-    db.Model.metadata,
-    Column("user_id", Integer, ForeignKey("user.id")),
-    Column("tribe_id", Integer, ForeignKey("tribe.id")),
-    Column("permissions", SQLEnum(PERMISSIONS)),
-)
+class PermissionsGroup(db.Model, DataModelMixin):
+    # many to many relationship
+    user_id = Column(ForeignKey("user.id"), primary_key=True)
+    tribe_id = Column(ForeignKey("tribe.id"), primary_key=True)
+    user = relationship("User", back_populates="tribes")
+    tribe = relationship("Tribe", back_populates="users")
 
-rooms = Table(
-    "rooms",
-    db.Model.metadata,
-    Column("user_id", Integer, ForeignKey("user.id")),
-    Column("room_id", Integer, ForeignKey("room.id")),
-    Column("permissions", SQLEnum(PERMISSIONS)),
-)
+    # extra data to describe the relationship
+    name = Column(String, nullable=False)
+    permissions = Column(
+        SQLEnum(PERMISSIONS), default=PERMISSIONS.EXECUTE, nullable=False
+    )
+
+    def __init__(self, name, user, tribe, permissions):
+        self.name = name
+        self.user = user
+        self.tribe = tribe
+        self.permissions = permissions
 
 
 class User(db.Model, DataModelMixin, UserMixin):
@@ -117,27 +119,12 @@ class User(db.Model, DataModelMixin, UserMixin):
     email = Column(String, nullable=False)
     password = Column(String)
 
-    # coms
-    tribe_membership = relationship(
-        "Tribe",
-        secondary=TribeMembers,
-        backref=backref("members", lazy="dynamic"),
-        lazy="dynamic",
-    )
-    room_membership = relationship(
-        "Room",
-        secondary=rooms,
-        backref=backref("members", lazy="dynamic"),
-        lazy="dynamic",
-    )
-
     posts = relationship("Post", backref="author")
 
     UniqueConstraint("email", name="unique_constraint_1")
 
-    # wallets
-
-    # expenses
+    # bi-directional many to many
+    tribes = relationship("PermissionsGroup", back_populates="user", lazy="dynamic")
 
     def __init__(
         self,
@@ -163,34 +150,6 @@ class User(db.Model, DataModelMixin, UserMixin):
         self.password = generate_password_hash(password)
         self.posts = posts
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def create_tribe(self, name, description, category):
-        tribe = Tribe(name=name, description=description, creator=self)
-        tribe.save()
-        self.join_tribe(tribe)
-        self.set_permissions(tribe, PERMISSIONS.EXECUTE)
-
-    def set_permissions(self, tribe, value):
-
-        db.session.query(TribeMembers).where(
-            TribeMembers.c.tribe_id == tribe.id
-        ).update(values={"permissions": value})
-
-        db.session.commit()
-
-    def get_permissions(self, tribe):
-        return (
-            db.session.query(TribeMembers.c.permissions)
-            .where(TribeMembers.c.user_id == self.id)
-            .scalar()
-        )
-
-    def set_group(self, tribe, user):
-        pass
-
     def join_tribe(self, tribe):
         """
 
@@ -202,7 +161,10 @@ class User(db.Model, DataModelMixin, UserMixin):
         """
 
         if not self.in_tribe(tribe):
-            self.tribe_membership.append(tribe)
+            permissions_group = PermissionsGroup(
+                name="applicant", user=self, tribe=tribe, permissions=PERMISSIONS.READ
+            )
+            permissions_group.save()
 
     def in_tribe(self, tribe):
         """
@@ -214,7 +176,7 @@ class User(db.Model, DataModelMixin, UserMixin):
 
         """
 
-        return tribe.members.filter(TribeMembers.c.user_id == self.id).count() > 0
+        return tribe.users.filter(PermissionsGroup.user_id == self.id).count() > 0
 
     def leave_tribe(self, tribe):
         """
@@ -227,7 +189,7 @@ class User(db.Model, DataModelMixin, UserMixin):
         """
 
         if self.in_tribe(tribe):
-            self.tribe_membership.remove(tribe)
+            self.tribes.remove(tribe)
 
     def __repr__(self):
         return f"<User {self.id} {self.name} -- {self.email} >"
@@ -249,12 +211,14 @@ class Tribe(db.Model, DataModelMixin):
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
 
+    # bi-directional many to many
+    users = relationship("PermissionsGroup", back_populates="tribe", lazy="dynamic")
+
     # Expenses one to many
     posts = relationship("Post", backref="tribe")
 
     # Chat one to many
     rooms = relationship("Room", backref="channel")
-    user_groups = relationship("UserGroup", backref="tribe")
 
     # Wallet
 
@@ -262,22 +226,15 @@ class Tribe(db.Model, DataModelMixin):
         self.name = name
         self.description = description
         self.creator = creator.id
-        self.members.append(creator)
-        self.create_group("admin")
+        self.create_permissions_group(
+            name="admin", user=creator, permissions=PERMISSIONS.EXECUTE
+        )
+
+        self.save()
 
         # set permissions
 
         # self.create_room()
-
-    def requires_permission(self, func, value):
-        @functools.wraps(func)
-        def wrapper_decorator(*args, **kwargs):
-            if value == current_user.get_permissions():
-                func(*args, **kwargs)
-            else:
-                raise PermissionError("Current User is not an admin")
-
-        return wrapper_decorator
 
     def preview(self):
         """
@@ -302,14 +259,16 @@ class Tribe(db.Model, DataModelMixin):
         db.session.add(self)
         db.session.commit()
 
-    def create_group(self, name):
+    def create_permissions_group(self, name, user, permissions=PERMISSIONS.EXECUTE):
         """
 
         :param name:
         :return:
         """
-        group = UserGroup(name=name)
-        group.save()
+        permissions_group = PermissionsGroup(
+            name=name, user=user, tribe=self, permissions=permissions
+        )
+        permissions_group.save()
 
     def create_room(self, user, name):
         pass
@@ -383,24 +342,3 @@ class Post(db.Model, DataModelMixin):
             author=user.name,
             parent=self.parent_id,
         )
-
-
-# class UserTribeData(db.Model):
-#     groups = relationship("Post", backref="room_msgs")
-
-
-class UserGroup(db.Model, DataModelMixin):
-    """
-
-    Group attribute for user
-
-    """
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    permissions = Column(Integer, default=0, nullable=False)
-
-    tribe_id = Column(Integer, ForeignKey("tribe.id"))
-
-    def __init__(self, name):
-        self.name = name

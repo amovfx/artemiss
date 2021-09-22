@@ -86,17 +86,20 @@ join_table = Table(
 class PermissionsGroup(db.Model, DataModelMixin):
     """
 
-    Many to Many relationship table that contains permissions data.
+    Association Object pattern.
+    This allows us to treat a relationship between a user and a tribe
+    as an object and store custom data.
+
 
     """
-
-    user_id = Column(ForeignKey("user.id"), primary_key=True)
-    tribe_id = Column(ForeignKey("tribe.id"), primary_key=True)
-    user = relationship("User", back_populates="permissiongroup")
-    tribe = relationship("Tribe", back_populates="permissiongroup")
+    id = Column(Integer, primary_key=True)
+    user_id = Column(ForeignKey("user.id"))
+    tribe_id = Column(ForeignKey("tribe.id"))
+    user = relationship("User", back_populates="tribes")
+    tribe = relationship("Tribe", back_populates="users")
 
     # extra data to describe the relationship, permissions restrict access.
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=True)
     permissions = Column(SQLEnum(PERMISSIONS), default=PERMISSIONS.NONE, nullable=False)
 
     @classmethod
@@ -158,7 +161,7 @@ class PermissionsGroup(db.Model, DataModelMixin):
             .update(values={"permissions": permissions})
         )
 
-    def __init__(self, name, user, tribe, permissions=PERMISSIONS.NONE, save=True):
+    def __init__(self, name, permissions=PERMISSIONS.NONE, save=True):
         """
 
         Create a new permissions group if user is not already in the tribe.
@@ -174,14 +177,11 @@ class PermissionsGroup(db.Model, DataModelMixin):
         :param save:
             bool to not save if you want to adjust settings past initialization.
         """
-        if not self.is_user_in_tribe(user, tribe):
-            self.name = name
-            self.user = user
-            self.tribe = tribe
-            self.permissions = permissions
+        self.name = name
+        self.permissions = permissions
 
-            if save:
-                self.save()
+        if save:
+            self.save()
 
     def __repr__(self):
         return f"< PermissionsGroup: {self.name} -- {self.user_id} - {self.tribe_id} -- {self.permissions.name}>"
@@ -205,12 +205,7 @@ class User(db.Model, DataModelMixin, UserMixin):
 
     UniqueConstraint("email", name="unique_constraint_1")
 
-    # bi-directional many to many
-    permissiongroup = relationship(
-        "PermissionsGroup", back_populates="user", lazy="dynamic"
-    )
-
-    tribes = relationship("Tribe", secondary=join_table, lazy="dynamic")
+    tribes = relationship("PermissionsGroup", back_populates="user", lazy="dynamic")
 
     # trust self relationship that allows people to automatically approve expenditures.
 
@@ -239,7 +234,7 @@ class User(db.Model, DataModelMixin, UserMixin):
         self.posts = posts
         self.save()
 
-    def join_tribe(self, tribe, permissions=PERMISSIONS.READ):
+    def join_tribe(self, tribe, permission_group_name, permissions=PERMISSIONS.NONE):
         """
 
         Join a tribe.
@@ -250,9 +245,11 @@ class User(db.Model, DataModelMixin, UserMixin):
         """
 
         if not self.is_in_tribe(tribe):
-            PermissionsGroup(
-                name="applicant", user=self, tribe=tribe, permissions=permissions
-            )
+            pg = PermissionsGroup(name=permission_group_name, permissions=permissions)
+            pg.tribe = tribe
+            self.tribes.append(pg)
+
+
 
     def is_in_tribe(self, tribe):
         """
@@ -265,7 +262,7 @@ class User(db.Model, DataModelMixin, UserMixin):
         """
 
         return (
-            tribe.permissiongroup.filter(PermissionsGroup.user_id == self.id).count()
+            tribe.users.filter(PermissionsGroup.user_id == self.id).count()
             > 0
         )
 
@@ -303,11 +300,9 @@ class Tribe(db.Model, DataModelMixin):
     description = Column(String, nullable=False)
 
     # bi-directional many to many
-    permissiongroup = relationship(
+    users = relationship(
         "PermissionsGroup", back_populates="tribe", lazy="dynamic"
     )
-
-    users = relationship("User", secondary=join_table, lazy="dynamic")
 
     # Expenses one to many
     posts = relationship("Post", backref="tribe")
@@ -324,11 +319,11 @@ class Tribe(db.Model, DataModelMixin):
     def __init__(self, name, description, creator, save=True):
         self.name = name
         self.description = description
+        creator.save()
         self.creator = creator.id
-        self.users.append(creator)
-        self.create_permissions_group(
-            name="admin", user=creator, permissions=PERMISSIONS.EXECUTE
-        )
+
+        self.add_user(creator, "admin", PERMISSIONS.EXECUTE)
+
         if save:
             self.save()
 
@@ -354,6 +349,12 @@ class Tribe(db.Model, DataModelMixin):
         """
         db.session.add(self)
         db.session.commit()
+
+    def add_user(self, user, permission_group_name, permissions):
+        pg = PermissionsGroup(name=permission_group_name, permissions=permissions)
+        pg.user = user
+        self.users.append(pg)
+
 
     def create_permissions_group(self, name, user, permissions=PERMISSIONS.EXECUTE):
         """

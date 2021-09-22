@@ -114,9 +114,9 @@ class TestTribeSubs(TestBaseCase):
         print(users)
 
         for user in users:
-            user.join_tribe(self.tribe)
+            user.join_tribe(self.tribe, permission_group_name="applicant")
 
-        self.assertEqual(value + 1, self.tribe.permissiongroup.count())
+        self.assertEqual(value + 1, self.tribe.users.count())
 
 
 @ddt
@@ -142,34 +142,17 @@ class TestUser(TestBaseCase):
         """
         user = generate_random_user()
         for tribe in self.tribes[:value]:
-            PermissionsGroup("name", user, tribe)
+            user.join_tribe(tribe, permission_group_name="applicant")
 
-
-        q = db.session.query(PermissionsGroup).filter(PermissionsGroup.user_id == user.id)
-        print (q.all())
-        self.assertEqual(value, q.count())
+        self.assertEqual(value, user.tribes.count())
 
     def test_join_tribe(self):
         tribe = generate_random_tribe() #make a tribe with a random user as owner
         user = generate_random_user()
-        user.name="join test"
-        user.save()
-        user.join_tribe(tribe)
+        user.join_tribe(tribe, permission_group_name="applicant")
 
-        print (tribe.permissiongroup.all())
-        self.assertEqual(tribe.permissiongroup.count(), 2)
+        self.assertEqual(tribe.users.count(), 2)
 
-    def test_append(self):
-        tribe = Tribe(name="testJoinTribe",
-                      description="unitTest for joining a tribe.",
-                      creator=generate_random_user())
-
-        user = generate_random_user()
-        user.name="append test"
-        user.save()
-        print(tribe.users.append(user))
-        print(tribe.users.all())
-        self.assertEqual(2, tribe.users.count())
 
 
 @ddt
@@ -180,28 +163,23 @@ class TestPermissionsGroup(TestBaseCase):
         self.tribe = Tribe("default", "test", self.user)
         generate_users(5)
 
-    def test_init(self):
-        PermissionsGroup("test", user=self.user, tribe=self.tribe)
-        PermissionsGroup("test2", user=self.user, tribe=self.tribe)
-        self.assertEqual(PermissionsGroup.query.count(), 1)
-
     def test_is_user_in_tribe(self):
-        PermissionsGroup("test", user=self.user, tribe=self.tribe)
+        user = User()
+        self.tribe.add_user(user, "applicant", PERMISSIONS.READ)
         self.assertTrue(PermissionsGroup.is_user_in_tribe(self.user, self.tribe))
 
 
     @idata(PERMISSIONS.unittest_idata_generator())
     def test_get_permissions(self, value):
         user = User()
-
-        pg = PermissionsGroup("test", user=user, tribe=self.tribe, permissions=value)
-        permissions = pg.get_tribe_user_permissions(user, self.tribe)
+        self.tribe.add_user(user, "applicant", value)
+        permissions = PermissionsGroup.get_tribe_user_permissions(user, self.tribe)
         self.assertIs(permissions, value)
 
     @idata(PERMISSIONS.unittest_idata_generator())
     def test_set_permissions(self, value):
         user = User()
-        pg = PermissionsGroup("test", user=user, tribe=self.tribe, permissions=PERMISSIONS.NONE)
+        self.tribe.add_user(user, "applicant", PERMISSIONS.NONE)
         PermissionsGroup.set_tribe_user_permissions(user, self.tribe, permissions=value)
         permissions = PermissionsGroup.get_tribe_user_permissions(user, self.tribe)
         self.assertIs(permissions, value)

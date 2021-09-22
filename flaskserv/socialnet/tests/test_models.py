@@ -4,16 +4,13 @@ Testing model integrations.
 
 """
 
-from ddt import ddt, data, unpack, idata, DATA_ATTR
+from ddt import ddt, data, idata
+import sys
+import warnings
 
 from flaskserv.socialnet.models import Tribe, User, PermissionsGroup, PERMISSIONS
 from flaskserv.socialnet.tests.test_base import TestBaseCase
-from flaskserv.socialnet.data.create_db import (
-    get_random_user,
-    generate_random_post,
-    generate_users,
-    generate_tribes,
-)
+from flaskserv.socialnet.data.create_db import *
 from flaskserv.socialnet import db
 
 
@@ -111,7 +108,7 @@ class TestTribeSubs(TestBaseCase):
         tribe.save()
         self.tribe = tribe
 
-    @data(1, 5, 8, 10, 25, 50, 100)
+    @data(1, 5, 8)
     def test_tribe_users(self, value):
         users = User.query.paginate(page=1, per_page=value).items
         print(users)
@@ -119,28 +116,61 @@ class TestTribeSubs(TestBaseCase):
         for user in users:
             user.join_tribe(self.tribe)
 
-        self.assertEqual(value + 1, self.tribe.users.count())
+        self.assertEqual(value + 1, self.tribe.permissiongroup.count())
 
 
 @ddt
-class TestUserTribes(TestBaseCase):
+class TestUser(TestBaseCase):
     def setUp(self):
 
         generate_users(1)
 
         self.user = User()
 
-        generate_tribes(100)
+        generate_tribes(10)
         self.tribes = Tribe.query.all()
 
-    @data(1, 5, 8, 10, 25, 50, 100)
+    @data(1, 5, 8)
     def test_user_tribes(self, value):
-        for tribe in self.tribes[:value]:
-            self.user.join_tribe(tribe)
-            self.user.join_tribe(tribe)
+        """
 
-        print(self.user.tribe_membership.all())
-        self.assertEqual(value + 1, self.user.tribe_membership.count())
+        Test how many tribes the user has joined
+
+        :param value:
+            ddt values
+        :return:
+        """
+        user = generate_random_user()
+        for tribe in self.tribes[:value]:
+            PermissionsGroup("name", user, tribe)
+
+
+        q = db.session.query(PermissionsGroup).filter(PermissionsGroup.user_id == user.id)
+        print (q.all())
+        self.assertEqual(value, q.count())
+
+    def test_join_tribe(self):
+        tribe = generate_random_tribe() #make a tribe with a random user as owner
+        user = generate_random_user()
+        user.name="join test"
+        user.save()
+        user.join_tribe(tribe)
+
+        print (tribe.permissiongroup.all())
+        self.assertEqual(tribe.permissiongroup.count(), 2)
+
+    def test_append(self):
+        tribe = Tribe(name="testJoinTribe",
+                      description="unitTest for joining a tribe.",
+                      creator=generate_random_user())
+
+        user = generate_random_user()
+        user.name="append test"
+        user.save()
+        print(tribe.users.append(user))
+        print(tribe.users.all())
+        self.assertEqual(2, tribe.users.count())
+
 
 @ddt
 class TestPermissionsGroup(TestBaseCase):
@@ -150,31 +180,33 @@ class TestPermissionsGroup(TestBaseCase):
         self.tribe = Tribe("default", "test", self.user)
         generate_users(5)
 
+    def test_init(self):
+        PermissionsGroup("test", user=self.user, tribe=self.tribe)
+        PermissionsGroup("test2", user=self.user, tribe=self.tribe)
+        self.assertEqual(PermissionsGroup.query.count(), 1)
+
+    def test_is_user_in_tribe(self):
+        PermissionsGroup("test", user=self.user, tribe=self.tribe)
+        self.assertTrue(PermissionsGroup.is_user_in_tribe(self.user, self.tribe))
+
+
     @idata(PERMISSIONS.unittest_idata_generator())
-    def test_permissions(self, value):
-        user = get_random_user()
+    def test_get_permissions(self, value):
+        user = User()
+
         pg = PermissionsGroup("test", user=user, tribe=self.tribe, permissions=value)
-        permissions = pg.get_user_tribe_permissions(user, self.tribe)
+        permissions = pg.get_tribe_user_permissions(user, self.tribe)
+        self.assertIs(permissions, value)
+
+    @idata(PERMISSIONS.unittest_idata_generator())
+    def test_set_permissions(self, value):
+        user = User()
+        pg = PermissionsGroup("test", user=user, tribe=self.tribe, permissions=PERMISSIONS.NONE)
+        PermissionsGroup.set_tribe_user_permissions(user, self.tribe, permissions=value)
+        permissions = PermissionsGroup.get_tribe_user_permissions(user, self.tribe)
         self.assertIs(permissions, value)
 
 
 
-@ddt
-class TestTribeMethods(TestBaseCase):
-    def setUp(self):
-        u = User()
-        tribe = Tribe(name="TestTribe",
-                      creator=u,
-                      description="Best Tribe")
-        self.user = u
 
-    def test_tribe(self):
-        tribe = Tribe.query.all()
-        assert tribe is not None
 
-    @idata(PERMISSIONS.unittest_idata_generator())
-    def test_permissions(self, value):
-        tribe = Tribe.query.all()[0]
-        self.user.set_permissions(tribe, value)
-        permissions = self.user.get_permissions(tribe)
-        self.assertEqual(value, permissions)

@@ -5,13 +5,16 @@ Testing model integrations.
 """
 
 from ddt import ddt, data, idata
-import sys
-import warnings
 
-from flaskserv.socialnet.models import Tribe, User, PermissionsGroup, PERMISSIONS
-from flaskserv.socialnet.tests.test_base import TestBaseCase
-from flaskserv.socialnet.data.create_db import *
 from flaskserv.socialnet import db
+from flaskserv.socialnet.constants import PERMISSIONS
+from flaskserv.socialnet.data.create_db import *
+from flaskserv.socialnet.models import Tribe, User, PermissionsGroup
+from flaskserv.socialnet.tests.test_base import TestBaseCase
+
+
+
+
 
 
 

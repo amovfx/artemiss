@@ -50,7 +50,7 @@ def get_tribe_comments(tribe_uuid):
 
         data = []
         for post, user in page_query.items:
-            data.append(post.preview(user))
+            data.append(post.as_dict().update({"user": user}))
 
         return make_response(jsonify(data), 200)
 

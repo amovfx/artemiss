@@ -431,24 +431,3 @@ class Post(db.Model, DataModelMixin):
 
     def level(self):
         return len(self.path) // self._N - 1
-
-    def preview(self, user):
-        """
-
-        A dict for a limited number of parameters.
-
-        :param user:
-            User orm to populate the author data.
-
-        :return:
-            dict of the expanded data.
-
-        """
-        return dict(
-            title=self.title,
-            message=self.message,
-            uuid=self.uuid,
-            path=self.path,
-            author=user.name,
-            parent=self.parent_id,
-        )

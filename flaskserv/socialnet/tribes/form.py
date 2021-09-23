@@ -11,6 +11,7 @@ class TribeForm(FlaskForm):
 
     name = StringField('name', validators=[DataRequired()])
     description = StringField('description', validators=[DataRequired()])
+    submit = SubmitField("submit")
 
 
 class PostForm(FlaskForm):

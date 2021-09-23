@@ -17,6 +17,9 @@ from flask_login import UserMixin, current_user
 from flaskserv.socialnet import db
 from werkzeug.security import generate_password_hash
 
+if os.environ.get("TESTING"):
+    generate_password_hash = lambda x: x
+
 from sqlalchemy import (
     Enum as SQLEnum,
     ForeignKey,
@@ -25,29 +28,10 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    Boolean,
     and_,
-    Table,
 )
 
-from sqlalchemy.orm import relationship, backref
-
-if os.environ.get("TESTING"):
-    generate_password_hash = lambda x: x
-
-
-def generate_uuid():
-    """
-
-    Function to generate a unique identifier for models.
-    :return:
-    """
-    return uuid.uuid4().hex[:16]
-
-
-
-
-
+from sqlalchemy.orm import relationship
 
 
 class DataModelMixin(object):
@@ -59,19 +43,14 @@ class DataModelMixin(object):
     """
 
     created_date = Column(DateTime, default=datetime.utcnow)
-    uuid = Column(String, default=generate_uuid, nullable=False)
+    uuid = Column(String, default=lambda: uuid.uuid4().hex[:16], nullable=False)
 
     def save(self):
         db.session.add(self)
         db.session.commit()
 
-
-join_table = Table(
-    "association",
-    db.Model.metadata,
-    Column("user_id", ForeignKey("user.id"), primary_key=True),
-    Column("tribe_id", ForeignKey("tribe.id"), primary_key=True),
-)
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class PermissionsGroup(db.Model, DataModelMixin):
@@ -83,6 +62,7 @@ class PermissionsGroup(db.Model, DataModelMixin):
 
 
     """
+
     id = Column(Integer, primary_key=True)
     user_id = Column(ForeignKey("user.id"))
     tribe_id = Column(ForeignKey("tribe.id"))
@@ -95,6 +75,18 @@ class PermissionsGroup(db.Model, DataModelMixin):
 
     @classmethod
     def is_user_in_tribe(cls, user, tribe):
+        """
+
+        Checks the user to see is in the tribe.
+
+        :param user:
+            USER orm.
+        :param tribe:
+            Tribe. ORM
+        :return:
+            True if count is greater than 0 False if otherise.
+
+        """
         return (
             db.session.query(PermissionsGroup)
             .filter(PermissionsGroup.user_id == user.id)
@@ -240,8 +232,6 @@ class User(db.Model, DataModelMixin, UserMixin):
             pg.tribe = tribe
             self.tribes.append(pg)
 
-
-
     def is_in_tribe(self, tribe):
         """
 
@@ -252,10 +242,7 @@ class User(db.Model, DataModelMixin, UserMixin):
 
         """
 
-        return (
-            tribe.users.filter(PermissionsGroup.user_id == self.id).count()
-            > 0
-        )
+        return tribe.users.filter(PermissionsGroup.user_id == self.id).count() > 0
 
     def leave_tribe(self, tribe):
         """
@@ -268,7 +255,10 @@ class User(db.Model, DataModelMixin, UserMixin):
         """
 
         if self.is_in_tribe(tribe):
-            self.tribes.remove(tribe)
+            permissions_group = tribe.users.filter(
+                PermissionsGroup.user_id == self.id
+            ).first()
+            tribe.users.remove(permissions_group)
 
     def __repr__(self):
         return f"<User {self.id} {self.name} -- {self.email} >"
@@ -291,9 +281,7 @@ class Tribe(db.Model, DataModelMixin):
     description = Column(String, nullable=False)
 
     # bi-directional many to many
-    users = relationship(
-        "PermissionsGroup", back_populates="tribe", lazy="dynamic"
-    )
+    users = relationship("PermissionsGroup", back_populates="tribe", lazy="dynamic")
 
     # Expenses one to many
     posts = relationship("Post", backref="tribe")
@@ -303,69 +291,97 @@ class Tribe(db.Model, DataModelMixin):
 
     # Wallet
 
-    @classmethod
-    def create_test_tribe(cls):
-        return cls.__init__(name=lorem.sentence().split())
-
     def __init__(self, name, description, creator, save=True):
+        """
+
+        Create a new tribe. This is a collection of users. Tribes can also form tribes.
+        THis is where people create a joint escrow.
+
+        :param name:
+            Name of the tribe
+        :param description:
+            A short description of what the tribe is about.
+
+        :param creator:
+        :param save:
+        """
         self.name = name
         self.description = description
-        creator.save()
-        self.creator = creator.id
+        self.creator_id = creator.id
 
         self.add_user(creator, "admin", PERMISSIONS.EXECUTE)
 
         if save:
             self.save()
 
-    def preview(self):
+    def add_user(
+        self,
+        user: User,
+        permission_group_name: str = "applicant",
+        permissions: PERMISSIONS = PERMISSIONS.NONE,
+    ):
         """
 
-        A dict for a limited number of parameters.
-
-        """
-        return dict(
-            name=self.name,
-            description=self.description,
-            owner_id=self.creator_id,
-            created_date=self.created_date,
-            uuid=self.uuid,
-        )
-
-    def save(self):
-        """
-
-        Quick save function.
+        Creates a permissions group and appends it to users.
+        :param user:
+            User orm
+        :param permission_group_name:
+            name of the permissions group
+        :param permissions:
+            Enum(PERMISSIONS)
         :return:
         """
-        db.session.add(self)
-        db.session.commit()
-
-    def add_user(self, user, permission_group_name, permissions):
         pg = PermissionsGroup(name=permission_group_name, permissions=permissions)
         pg.user = user
         self.users.append(pg)
 
-
-    def create_permissions_group(self, name, user, permissions=PERMISSIONS.EXECUTE):
+    def get_users(self, custom_filter=None):
         """
 
-        :param name:
+        Return the users with their permissions group that are in this tribe.
+
+        :param custom_filter:
+            A custom filter that can be used on the query.
+
         :return:
         """
-        permissions_group = PermissionsGroup(
-            name=name, user=user, tribe=self, permissions=permissions
-        )
-        permissions_group.save()
+        conditional = PermissionsGroup.tribe_id == self.id
+        custom_conditional = and_(conditional, custom_filter)
+        condition = conditional if custom_filter is None else custom_conditional
 
-    def get_user_permissions(self, user):
+        q = (
+            db.session.query(User, PermissionsGroup)
+            .join(PermissionsGroup, PermissionsGroup.user_id == User.id)
+            .filter(condition)
+            .order_by(PermissionsGroup.permissions)
+        )
+
+        return q
+
+    def get_user_permissions(self, user: User):
+        """
+
+        Return the permissions of the user for this tribe.
+
+        :param user:
+            User orm
+        :return:
+            Enum(PERMISSIONS)
+        """
         return PermissionsGroup.get_tribe_user_permissions(user, self)
 
-    def update_user_permissions(self, user):
-        pass
+    def set_user_permissions(self, user: User, permissions: PERMISSIONS):
+        """
 
-    def create_room(self, user, name):
-        pass
+        Set the user permissions for this tribe.
+
+        :param user:
+            User orm.
+        :param permissions:
+            Enum(PERMISSIONS)
+
+        """
+        PermissionsGroup.set_tribe_user_permissions(user, self, permissions)
 
     def __repr__(self):
         return f"<Tribe {self.id} -- {self.name}>"

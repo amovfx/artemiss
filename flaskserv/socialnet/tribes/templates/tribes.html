@@ -72,8 +72,9 @@ div.sticky {
                     template_clone.querySelector("#description").innerHTML = `${data[i]["description"]}`;
                     template_clone.querySelector("#tribe_link").href = `/tribe/${data[i]["uuid"]}`;
                     scroller.append(template_clone);
-                    counter += 1;
+
                 }
+                counter += 1;
                 // would like to unobserve the lazy loader.
             })
         })

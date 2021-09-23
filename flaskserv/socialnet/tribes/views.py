@@ -83,10 +83,6 @@ def tribe(uuid):
     session["TRIBE_ID"] = tribe.id
     session["TRIBE_UUID"] = tribe.uuid
     session["TRIBE"] = tribe.id
-    session["room"] = f"{tribe.id}:general"
-    setattr(current_user, "tribe", tribe)
-    print ("Tribe:", current_user.tribe)
-    current_user.set_active_tribe(tribe)
 
 
     return render_template(
@@ -156,10 +152,7 @@ def create_tribe():
                 description=request.form["description"],
                 creator=user,
             )
-
-            db.session.add(tribe)
-            db.session.commit()
-
+            print (tribe)
             return redirect(url_for("tribes.tribes"))
 
     return render_template("tribes_create.html", form=form)
@@ -190,11 +183,11 @@ def load():
         """
 
         light_response_objects = []
-        tribes_slice = Tribe.query.paginate(counter, quantity).items
+
+        tribes_slice = Tribe.query.order_by(Tribe.created_date).paginate(counter, quantity).items
 
         for tribe in tribes_slice:
             light_response_objects.append(tribe.as_dict())
-
         return light_response_objects
 
     if request.args:

@@ -9,11 +9,11 @@
 * {
     box-sizing: border-box;
 }
-body {
+.comment-thread {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     line-height: 1.4;
     color: rgba(0, 0, 0, 0.85);
-    background-color: #f9f9f9;
+    background-color: #ffffff;
 
 }
 button {
@@ -58,6 +58,7 @@ button:active {
 .comment {
     position: relative;
     margin: 20px auto;
+    background-color: #ffffff;
 }
 .comment-heading {
     display: flex;

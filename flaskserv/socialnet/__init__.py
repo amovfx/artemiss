@@ -3,32 +3,29 @@
 App factory for a basic social net.
 
 """
+from engineio.async_drivers import gevent
 
 from flask import Flask
-
-from flask_login import LoginManager
-
-from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 from flask_bootstrap.nav import BootstrapRenderer
+from flask_login import LoginManager
 from flask_nav import Nav, register_renderer
-
 from flask_socketio import SocketIO
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
+
 
 from .config import DevelopmentConfig
 from .nav import navbar
 
 login_manager = LoginManager()
-login_manager.session_protection = 'strong'
-login_manager.login_view = 'auth.login'
-
-from flask_wtf.csrf import CSRFProtect
-
-
+login_manager.session_protection = "strong"
+login_manager.login_view = "auth.login"
 
 
 db = SQLAlchemy()
 socketio = SocketIO()
+
 
 def create_app(config_class=DevelopmentConfig):
     """
@@ -43,17 +40,12 @@ def create_app(config_class=DevelopmentConfig):
     app.config.from_object(config_class)
     db.init_app(app)
 
-
-
     login_manager.init_app(app)
 
     Bootstrap(app=app)
     nav = Nav(app=app)
-    register_renderer(app=app,
-                      id='bootstrap',
-                      renderer=BootstrapRenderer)
+    register_renderer(app=app, id="bootstrap", renderer=BootstrapRenderer)
     nav.register_element("main_nav_bar", navbar)
-
 
     from .auth.views import auth_bp
     from .landing.views import landing_bp
@@ -72,15 +64,16 @@ def create_app(config_class=DevelopmentConfig):
     csrf = CSRFProtect(app)
     csrf.init_app(app)
 
-    socketio.init_app(app)
+    socketio.init_app(app, async_mode="threading", cors_allowed_origins="*")
 
     return app
+
 
 csrf = CSRFProtect()
 
 from .models import User
 
+
 @login_manager.user_loader
 def load_user(user_id):
-        return User.query.get(int(user_id))
-
+    return User.query.get(int(user_id))

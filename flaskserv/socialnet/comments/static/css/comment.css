@@ -40,6 +40,7 @@ button:active {
     padding: 0 30px;
     background-color: #fff;
     border: 1px solid transparent; /* Removes margin collapse */
+    justify-self: start;
 }
 .m-0 {
     margin: 0;
@@ -59,6 +60,7 @@ button:active {
     position: relative;
     margin: 20px auto;
 
+
 }
 .comment-heading {
     display: flex;
@@ -66,6 +68,7 @@ button:active {
     height: 50px;
     font-size: 14px;
 }
+
 .comment-voting {
     width: 20px;
     height: 32px;

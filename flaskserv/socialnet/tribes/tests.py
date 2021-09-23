@@ -147,8 +147,10 @@ class TestTribeRoutes(TestBaseCase):
     def test_tribe_route(self):
 
         first_tribe = Tribe.query.all()[0]
+        print (first_tribe)
         response = self.client.get(f'/tribe/{first_tribe.uuid}',
                                     content_type='html/text')
+
 
         self.assertEqual(response.status_code, 200)
 

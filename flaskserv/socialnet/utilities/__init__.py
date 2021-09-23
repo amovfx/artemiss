@@ -87,4 +87,4 @@ def make_blueprint(name):
         create_file(bp_folder, file_name, contents=content)
 
 if __name__ == '__main__':
-    make_blueprint("comments")
+    make_blueprint("chat")

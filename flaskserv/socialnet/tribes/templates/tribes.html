@@ -4,18 +4,16 @@
     <div class="row">
         <div class="col-md-8" >
             <!-- this is where the templates are injected my js -->
-            <div id="scroller"></div>
+            <div id="tribes-list" class="comment-thread">
+                <div id="infinite-scroller"></div>
+                    <div class="d-flex justify-content-center mb-3" id="sentinel">
+                        <div class="spinner-boarder" role="status"></div>
+                    </div>
 
-            <!-- this is the intersection observer that makes load calls -->
-            <div class="d-flex justify-content-center mb-3"
-                 id="sentinel"
-            >
-                <div class="spinner-boarder" role="status"></div>
+            </div>
 
             </div>
         </div>
-
-
         <div class="sticky col-md-4">
             <div class="shadow">
                  <a href={{ url_for('tribes.create_tribe') }} class="btn btn-default btn-lg" role="button">New Tribe</a>
@@ -51,57 +49,42 @@ div.sticky {
     </div>
 </template>
 
+<script src="{{ url_for('comments.static', filename='js/infinite_scroller.js') }}"></script>
 <script>
-    var scroller = document.querySelector("#scroller");
-    var template = document.querySelector("#post_template");
 
-    var sentinel = document.querySelector("#sentinel");
+    class PostTemplateUpdateStrategy extends AbstractTemplateUpdateStrategy
+    {
+        /*
+        @abstract
+         */
+        update(data)
+        {
+            let creator = data['creator'] || undefined;
+            let title = data['title'] || undefined;
+            let uuid = data['uuid'] || undefined;
+            let description = data['description'] || undefined;
 
-    var counter = 0;
+            this.template_clone.getElementById("tribe_link").href = `/tribe/${uuid}`;
+            this.template_clone.getElementById("creator").innerHTML = creator;
+            this.template_clone.getElementById("title").innerHTML(title);
+            this.template_clone.getElementById("description").innerHTML = description;
 
-    function loadItems() {
-        fetch(`/tribes/load?c=${counter}`).then((response) => {
-            response.json().then((data) => {
-                if (!data.length) {
-                    sentinel.innerHTML = "No More Orgs. ";
-                }
-                for (var i = 0; i < data.length; i++) {
-
-                    let template_clone = template.content.cloneNode(true);
-                    template_clone.querySelector("#title").innerHTML = `${data[i]["name"]}`;
-                    template_clone.querySelector("#description").innerHTML = `${data[i]["description"]}`;
-                    template_clone.querySelector("#tribe_link").href = `/tribe/${data[i]["uuid"]}`;
-                    scroller.append(template_clone);
-
-                }
-                counter += 1;
-                // would like to unobserve the lazy loader.
-            })
-        })
+            return this.template_clone
+        }
     }
 
 
-    var intersectionObserver = new IntersectionObserver(entries => {
 
-     //Uncomment below to see the entry.intersectionRatio when
-     //the sentinel comes into view
 
-     entries.forEach(entry => {
-         console.log(entry.intersectionRatio);
-     })
+    var Template_Update_Strategy = new PostTemplateUpdateStrategy("#post_template", "#tribes_list");
+    var Template_Cloner = new TemplateCloner(Template_Update_Strategy);
 
-    // If intersectionRatio is 0, the sentinel is out of view
-    // and we don't need to do anything. Exit the function
-    if (entries[0].intersectionRatio <= 0) {
-    return;
-    }
+    let endpoint = "{{ url_for('tribes.load') }}"
+    var infinite_loader = new InfiniteLoader(endpoint, Template_Cloner);
 
-    // Call the loadItems function
-    loadItems();
-    });
+    //observe default value, and element that has an id of "sentinel"
+    infinite_loader.observe(sentinel_id = "#sentinel");
 
-// Instruct the IntersectionObserver to watch the sentinel
-intersectionObserver.observe(sentinel);
 </script>
 
 {% endblock %}

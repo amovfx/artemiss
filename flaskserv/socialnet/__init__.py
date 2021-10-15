@@ -6,6 +6,7 @@ App factory for a basic social net.
 from engineio.async_drivers import gevent
 
 from flask import Flask
+from flask_assets import Environment
 from flask_bootstrap import Bootstrap
 from flask_bootstrap.nav import BootstrapRenderer
 from flask_login import LoginManager
@@ -14,7 +15,7 @@ from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 
-
+from .assets.js import infinite_loader_js
 from .config import DevelopmentConfig
 from .nav import navbar
 
@@ -42,10 +43,15 @@ def create_app(config_class=DevelopmentConfig):
 
     login_manager.init_app(app)
 
+    #register javascript assets
+    assets = Environment(app)
+    assets.register('infinite_scoller_js', infinite_loader_js)
+
     Bootstrap(app=app)
     nav = Nav(app=app)
     register_renderer(app=app, id="bootstrap", renderer=BootstrapRenderer)
     nav.register_element("main_nav_bar", navbar)
+
 
     from .auth.views import auth_bp
     from .landing.views import landing_bp
@@ -64,7 +70,9 @@ def create_app(config_class=DevelopmentConfig):
     csrf = CSRFProtect(app)
     csrf.init_app(app)
 
-    socketio.init_app(app, async_mode="threading", cors_allowed_origins="*")
+    socketio.init_app(app,
+                      async_mode="threading",
+                      cors_allowed_origins="*")
 
     return app
 

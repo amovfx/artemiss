@@ -56,7 +56,7 @@
 
 </style>
 
-<script src="{{ url_for('comments.static', filename='js/load_comments.js') }}"></script>
+<script src="{{ url_for('comments.static', filename='js/infinite_scroller.js') }}"></script>
 <script>
 
     let endpoint = "{{ url_for('comments.get_tribe_comments', tribe_uuid=tribe.uuid) }}"

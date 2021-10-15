@@ -54,26 +54,24 @@ class InfiniteLoader
     {
         this.set_scroller(scroller);
         this.set_template(html_template);
-        this.set_sentinel(sentinel)
+        this.set_sentinel(sentinel);
         this._template = document.querySelector(html_template);
-
-        ;
-        this._endpoint = endpoint
+        this._endpoint = endpoint;
     }
 
     set_scroller(scroller_element_name)
     {
-        this._scroller = document.querySelector(scroller_element_name)
+        this._scroller = document.querySelector(scroller_element_name);
     }
 
     set_template(html_template)
     {
-        this._template = document.querySelector(html_template)
+        this._template = document.querySelector(html_template);
     }
 
     get_template()
     {
-        return this._template
+        return this._template;
     }
 
     set_sentinel(sentinel_element)
